@@ -10,15 +10,17 @@ export class StudyCycle {
     constructor() {
         this.cycles = [];
         this.activeCycleId = null;
+        this.loadPromise = null;
         
-        this.loadCycles();
+        // Não carregar no construtor - deve ser chamado explicitamente
+        // this.loadCycles();
         this.checkWeekReset();
     }
 
     /**
      * Cria um novo ciclo de estudos
      */
-    createCycle(cycleData) {
+    async createCycle(cycleData) {
         const newCycle = {
             id: Date.now().toString(),
             name: cycleData.name,
@@ -36,7 +38,7 @@ export class StudyCycle {
             this.activeCycleId = newCycle.id;
         }
         
-        this.saveCycles();
+        await this.saveCycles();
         return newCycle;
     }
 
@@ -98,9 +100,9 @@ export class StudyCycle {
     }
 
     /**
-     * Remove uma disciplina do ciclo
+     * Remove uma disciplina do ciclo (localStorage + backend)
      */
-    removeSubject(subjectId, cycleId = null) {
+    async removeSubject(subjectId, cycleId = null) {
         const cycle = this.getCycle(cycleId || this.activeCycleId);
         if (!cycle) return;
 
@@ -111,13 +113,27 @@ export class StudyCycle {
             cycle.currentSubjectIndex = 0;
         }
         
-        this.saveCycles();
+        // Deletar do backend
+        try {
+            await StorageManager.deleteSubject(subjectId);
+        } catch (error) {
+            console.warn('Erro ao deletar disciplina do backend:', error);
+        }
+        
+        await this.saveCycles();
+    }
+    
+    /**
+     * Alias para removeSubject
+     */
+    async deleteSubject(subjectId, cycleId = null) {
+        return await this.removeSubject(subjectId, cycleId);
     }
 
     /**
-     * Edita uma disciplina existente
+     * Edita uma disciplina existente (localStorage + backend)
      */
-    editSubject(subjectId, updates, cycleId = null) {
+    async editSubject(subjectId, updates, cycleId = null) {
         const cycle = this.getCycle(cycleId || this.activeCycleId);
         if (!cycle) return;
 
@@ -127,7 +143,15 @@ export class StudyCycle {
                 ...cycle.subjects[subjectIndex],
                 ...updates
             };
-            this.saveCycles();
+            
+            // Atualizar no backend
+            try {
+                await StorageManager.updateSubject(subjectId, updates);
+            } catch (error) {
+                console.warn('Erro ao atualizar disciplina no backend:', error);
+            }
+            
+            await this.saveCycles();
         }
     }
 
@@ -158,9 +182,9 @@ export class StudyCycle {
     }
 
     /**
-     * Remove um ciclo
+     * Remove um ciclo (localStorage + backend)
      */
-    removeCycle(cycleId) {
+    async deleteCycle(cycleId) {
         if (this.cycles.length <= 1) {
             return false; // Não pode remover o último ciclo
         }
@@ -172,19 +196,41 @@ export class StudyCycle {
             this.activeCycleId = this.cycles[0].id;
         }
         
-        this.saveCycles();
+        // Deletar do backend
+        try {
+            await StorageManager.deleteCycle(cycleId);
+        } catch (error) {
+            console.warn('Erro ao deletar ciclo do backend:', error);
+        }
+        
+        await this.saveCycles();
         return true;
+    }
+    
+    /**
+     * Remove um ciclo (alias para deleteCycle - compatibilidade)
+     */
+    async removeCycle(cycleId) {
+        return await this.deleteCycle(cycleId);
     }
 
     /**
-     * Edita um ciclo
+     * Edita um ciclo (localStorage + backend)
      */
-    editCycle(cycleId, updates) {
+    async editCycle(cycleId, updates) {
         const cycle = this.getCycle(cycleId);
         if (!cycle) return false;
 
         Object.assign(cycle, updates);
-        this.saveCycles();
+        
+        // Atualizar no backend
+        try {
+            await StorageManager.updateCycle(cycleId, updates);
+        } catch (error) {
+            console.warn('Erro ao atualizar ciclo no backend:', error);
+        }
+        
+        await this.saveCycles();
         return true;
     }
 
@@ -380,20 +426,159 @@ export class StudyCycle {
     }
 
     /**
-     * Salva todos os ciclos
+     * Salva todos os ciclos (localStorage + backend)
      */
-    saveCycles() {
+    async saveCycles() {
         const data = {
             cycles: this.cycles,
             activeCycleId: this.activeCycleId
         };
+        
+        // Salvar no localStorage (síncrono)
         StorageManager.save(STORAGE_KEYS.STUDY_CYCLE, data);
+        
+        // Salvar no backend (assíncrono)
+        try {
+            // Sincronizar cada ciclo com o backend
+            for (const cycle of this.cycles) {
+                await this.syncCycleToBackend(cycle);
+            }
+        } catch (error) {
+            console.warn('Erro ao sincronizar ciclos com backend:', error);
+        }
+    }
+    
+    /**
+     * Sincroniza um ciclo com o backend
+     */
+    async syncCycleToBackend(cycle) {
+        try {
+            // Verificar se o ciclo já existe no backend
+            const cycleData = {
+                id: cycle.id,
+                name: cycle.name,
+                study_days: cycle.studyDays,
+                created_at: cycle.createdAt,
+                week_start_date: cycle.weekStartDate,
+                is_active: cycle.id === this.activeCycleId
+            };
+            
+            // Tentar criar ou atualizar o ciclo
+            await StorageManager.createCycle(cycleData);
+            
+            // Sincronizar disciplinas
+            for (const subject of cycle.subjects) {
+                await this.syncSubjectToBackend(subject, cycle.id);
+            }
+        } catch (error) {
+            console.warn('Erro ao sincronizar ciclo com backend:', error);
+        }
+    }
+    
+    /**
+     * Sincroniza uma disciplina com o backend
+     */
+    async syncSubjectToBackend(subject, cycleId) {
+        try {
+            const subjectData = {
+                id: subject.id,
+                cycle_id: cycleId,
+                name: subject.name,
+                weeklyHours: subject.weeklyHours,
+                color: subject.color,
+                priority: subject.priority,
+                currentWeekMinutes: subject.currentWeekMinutes || 0,
+                totalMinutes: subject.totalMinutes || 0,
+                totalSessions: subject.totalSessions || 0
+            };
+            
+            await StorageManager.createSubject(subjectData);
+        } catch (error) {
+            console.warn('Erro ao sincronizar disciplina com backend:', error);
+        }
     }
 
     /**
-     * Carrega todos os ciclos
+     * Carrega todos os ciclos (localStorage + backend)
      */
-    loadCycles() {
+    async loadCycles() {
+        // Se já está carregando, retornar a Promise existente
+        if (this.loadPromise) {
+            return this.loadPromise;
+        }
+        
+        this.loadPromise = this._loadCyclesInternal();
+        const result = await this.loadPromise;
+        this.loadPromise = null;
+        return result;
+    }
+    
+    async _loadCyclesInternal() {
+        console.log('🔄 StudyCycle: Iniciando carregamento de ciclos...');
+        
+        // Primeiro, tentar carregar do backend
+        try {
+            console.log('🌐 StudyCycle: Tentando carregar do backend...');
+            const backendCycles = await StorageManager.getCycles();
+            console.log('📦 StudyCycle: Resposta do backend:', backendCycles);
+            
+            if (backendCycles && backendCycles.length > 0) {
+                console.log(`✅ StudyCycle: ${backendCycles.length} ciclo(s) encontrado(s) no backend`);
+                
+                // Converter formato do backend para formato local
+                this.cycles = await Promise.all(backendCycles.map(async (cycle) => {
+                    // Buscar disciplinas do ciclo
+                    const subjects = cycle.subjects || [];
+                    console.log(`  📚 Ciclo "${cycle.name}": ${subjects.length} disciplina(s)`);
+                    
+                    return {
+                        id: cycle.id,
+                        name: cycle.name,
+                        studyDays: cycle.study_days || [],
+                        subjects: subjects.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            weeklyHours: s.weeklyHours || s.weekly_hours,
+                            color: s.color,
+                            priority: s.priority,
+                            currentWeekMinutes: s.currentWeekMinutes || s.current_week_minutes || 0,
+                            totalMinutes: s.totalMinutes || s.total_minutes || 0,
+                            totalSessions: s.totalSessions || s.total_sessions || 0
+                        })),
+                        createdAt: cycle.created_at,
+                        weekStartDate: cycle.week_start_date
+                    };
+                }));
+                
+                // Verificar ciclo ativo
+                const activeCycle = backendCycles.find(c => c.is_active);
+                if (activeCycle) {
+                    this.activeCycleId = activeCycle.id;
+                    console.log('✅ StudyCycle: Ciclo ativo definido:', activeCycle.name);
+                } else if (this.cycles.length > 0) {
+                    this.activeCycleId = this.cycles[0].id;
+                    console.log('⚠️ StudyCycle: Nenhum ciclo ativo no backend, usando primeiro ciclo:', this.cycles[0].name);
+                }
+                
+                console.log('💾 StudyCycle: Salvando no localStorage...');
+                // Salvar no localStorage para acesso offline
+                const data = {
+                    cycles: this.cycles,
+                    activeCycleId: this.activeCycleId
+                };
+                StorageManager.save(STORAGE_KEYS.STUDY_CYCLE, data);
+                
+                console.log('✅ StudyCycle: Carregamento concluído com sucesso!');
+                return;
+            } else {
+                console.log('⚠️ StudyCycle: Nenhum ciclo encontrado no backend');
+            }
+        } catch (error) {
+            console.warn('❌ StudyCycle: Erro ao carregar ciclos do backend, usando localStorage:', error);
+        }
+        
+        // Fallback para localStorage
+        console.log('📂 StudyCycle: Tentando carregar do localStorage...');
         const data = StorageManager.load(STORAGE_KEYS.STUDY_CYCLE);
         
         if (data) {
@@ -403,7 +588,7 @@ export class StudyCycle {
 
         // Se não tem nenhum ciclo, criar um padrão
         if (this.cycles.length === 0) {
-            this.createCycle({
+            await this.createCycle({
                 name: 'Meu Ciclo de Estudos',
                 studyDays: ['mon', 'tue', 'wed', 'thu', 'fri']
             });

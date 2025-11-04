@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - LocalStorage</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        h1 {
+            color: #e74c3c;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #c0392b;
+        }
+        button.success {
+            background: #2ecc71;
+        }
+        button.success:hover {
+            background: #27ae60;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #444;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.ok {
+            background: #27ae60;
+        }
+        .status.error {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug - LocalStorage & API</h1>
+    
+    <div class="section">
+        <h2>📦 LocalStorage Status</h2>
+        <div id="localStorageStatus"></div>
+        <button onclick="checkLocalStorage()">🔍 Verificar LocalStorage</button>
+        <button onclick="clearLocalStorage()" style="background: #f39c12;">🗑️ Limpar LocalStorage</button>
+        <button onclick="resetToDefaults()" class="success">♻️ Resetar com Valores Padrão</button>
+    </div>
+
+    <div class="section">
+        <h2>🌐 API Backend Status</h2>
+        <div id="apiStatus"></div>
+        <button onclick="checkBackend()">🔍 Verificar Backend</button>
+        <button onclick="testCreateCycle()">➕ Testar Criar Ciclo</button>
+    </div>
+
+    <div class="section">
+        <h2>📊 Dados Armazenados</h2>
+        <pre id="storageData">Clique em "Verificar LocalStorage" para ver os dados</pre>
+    </div>
+
+    <script type="module">
+        import { DEFAULT_SETTINGS, STORAGE_KEYS } from './js/config.js';
+        import { StorageManager } from './js/storage.js';
+
+        window.checkLocalStorage = () => {
+            const status = document.getElementById('localStorageStatus');
+            const data = document.getElementById('storageData');
+            
+            try {
+                // Verificar cada chave
+                const settings = StorageManager.load(STORAGE_KEYS.SETTINGS);
+                const stats = StorageManager.load(STORAGE_KEYS.STATS);
+                const cycle = StorageManager.load(STORAGE_KEYS.STUDY_CYCLE);
+                
+                const result = {
+                    settings: settings || 'Não encontrado',
+                    stats: stats || 'Não encontrado',
+                    cycle: cycle || 'Não encontrado',
+                    all_keys: Object.keys(localStorage)
+                };
+                
+                data.textContent = JSON.stringify(result, null, 2);
+                
+                // Verificar se settings está OK
+                if (settings && settings.focusTime && settings.shortBreakTime && settings.longBreakTime) {
+                    status.innerHTML = '<div class="status ok">✅ LocalStorage está OK!</div>';
+                } else {
+                    status.innerHTML = '<div class="status error">❌ Settings não encontrado ou incompleto!</div>';
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="status error">❌ Erro: ${error.message}</div>`;
+                data.textContent = error.stack;
+            }
+        };
+
+        window.clearLocalStorage = () => {
+            if (confirm('Tem certeza que deseja limpar todo o LocalStorage?')) {
+                localStorage.clear();
+                alert('✅ LocalStorage limpo com sucesso!');
+                checkLocalStorage();
+            }
+        };
+
+        window.resetToDefaults = () => {
+            // Salvar configurações padrão
+            StorageManager.saveSettings(DEFAULT_SETTINGS);
+            
+            // Salvar stats padrão
+            const defaultStats = {
+                completedSessions: 0,
+                totalMinutes: 0,
+                date: new Date().toDateString()
+            };
+            StorageManager.saveStats(defaultStats);
+            
+            alert('✅ Configurações resetadas para valores padrão!');
+            checkLocalStorage();
+        };
+
+        window.checkBackend = async () => {
+            const status = document.getElementById('apiStatus');
+            status.innerHTML = '<div class="status">⏳ Verificando backend...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/cycles');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = `
+                        <div class="status ok">
+                            ✅ Backend está rodando!<br>
+                            Ciclos encontrados: ${data.length}
+                        </div>
+                    `;
+                } else {
+                    status.innerHTML = `<div class="status error">❌ Backend respondeu com erro: ${response.status}</div>`;
+                }
+            } catch (error) {
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Não foi possível conectar ao backend!<br>
+                        Erro: ${error.message}<br><br>
+                        <strong>Solução:</strong> Inicie o backend com:<br>
+                        <code>python3 -m uvicorn backend.main:app --reload --port 8000</code>
+                    </div>
+                `;
+            }
+        };
+
+        window.testCreateCycle = async () => {
+            const status = document.getElementById('apiStatus');
+            status.innerHTML = '<div class="status">⏳ Testando criação de ciclo...</div>';
+            
+            try {
+                const testCycle = {
+                    id: `test-${Date.now()}`,
+                    name: 'Ciclo de Teste',
+                    study_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                    created_at: new Date().toISOString(),
+                    week_start_date: new Date().toISOString().split('T')[0],
+                    is_active: true
+                };
+                
+                const response = await fetch('http://localhost:8000/api/cycles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testCycle)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = `
+                        <div class="status ok">
+                            ✅ Ciclo criado com sucesso!<br>
+                            ID: ${data.id}
+                        </div>
+                    `;
+                } else {
+                    const error = await response.text();
+                    status.innerHTML = `<div class="status error">❌ Erro ao criar ciclo: ${error}</div>`;
+                }
+            } catch (error) {
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Não foi possível criar ciclo!<br>
+                        Erro: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        // Executar verificações ao carregar
+        window.onload = () => {
+            checkLocalStorage();
+            checkBackend();
+        };
+    </script>
+</body>
+</html>

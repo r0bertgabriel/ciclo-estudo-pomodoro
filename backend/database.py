@@ -74,25 +74,30 @@ class Database:
     # ===== CYCLES =====
     
     def create_cycle(self, cycle_data):
-        """Cria um novo ciclo"""
+        """Cria um novo ciclo (ou atualiza se já existir)"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        cursor.execute('''
-            INSERT INTO cycles (id, name, study_days, created_at, week_start_date, is_active)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
-            cycle_data['id'],
-            cycle_data['name'],
-            json.dumps(cycle_data['study_days']),
-            cycle_data['created_at'],
-            cycle_data['week_start_date'],
-            1 if cycle_data.get('is_active', False) else 0
-        ))
-        
-        conn.commit()
-        conn.close()
-        return cycle_data
+        try:
+            cursor.execute('''
+                INSERT OR REPLACE INTO cycles (id, name, study_days, created_at, week_start_date, is_active)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (
+                cycle_data['id'],
+                cycle_data['name'],
+                json.dumps(cycle_data['study_days']),
+                cycle_data['created_at'],
+                cycle_data['week_start_date'],
+                1 if cycle_data.get('is_active', False) else 0
+            ))
+            
+            conn.commit()
+            return cycle_data
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
     
     def get_all_cycles(self):
         """Retorna todos os ciclos"""
@@ -217,29 +222,34 @@ class Database:
     # ===== SUBJECTS =====
     
     def create_subject(self, subject_data):
-        """Cria uma nova disciplina"""
+        """Cria uma nova disciplina (ou atualiza se já existir)"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        cursor.execute('''
-            INSERT INTO subjects 
-            (id, cycle_id, name, weekly_hours, color, priority, current_week_minutes, total_minutes, total_sessions)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            subject_data['id'],
-            subject_data['cycle_id'],
-            subject_data['name'],
-            subject_data['weekly_hours'],
-            subject_data['color'],
-            subject_data['priority'],
-            subject_data.get('current_week_minutes', 0),
-            subject_data.get('total_minutes', 0),
-            subject_data.get('total_sessions', 0)
-        ))
-        
-        conn.commit()
-        conn.close()
-        return subject_data
+        try:
+            cursor.execute('''
+                INSERT OR REPLACE INTO subjects 
+                (id, cycle_id, name, weekly_hours, color, priority, current_week_minutes, total_minutes, total_sessions)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                subject_data['id'],
+                subject_data['cycle_id'],
+                subject_data['name'],
+                subject_data.get('weekly_hours', subject_data.get('weeklyHours', 0)),
+                subject_data['color'],
+                subject_data['priority'],
+                subject_data.get('current_week_minutes', subject_data.get('currentWeekMinutes', 0)),
+                subject_data.get('total_minutes', subject_data.get('totalMinutes', 0)),
+                subject_data.get('total_sessions', subject_data.get('totalSessions', 0))
+            ))
+            
+            conn.commit()
+            return subject_data
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
     
     def get_subjects_by_cycle(self, cycle_id):
         """Retorna todas as disciplinas de um ciclo"""

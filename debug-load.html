@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Carregamento de Ciclos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        h1 { color: #e74c3c; }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #c0392b; }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #444;
+            max-height: 400px;
+            font-size: 12px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.ok { background: #27ae60; }
+        .status.error { background: #e74c3c; }
+        .status.warning { background: #f39c12; }
+        .log {
+            background: #000;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #3498db;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug - Carregamento de Ciclos</h1>
+    
+    <div class="section">
+        <h2>1️⃣ Testar API Diretamente</h2>
+        <div id="apiStatus"></div>
+        <button onclick="testAPI()">🌐 Testar API Backend</button>
+        <pre id="apiResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣ Testar StorageManager.getCycles()</h2>
+        <div id="storageStatus"></div>
+        <button onclick="testStorageManager()">📦 Testar StorageManager</button>
+        <pre id="storageResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3️⃣ Testar StudyCycle.loadCycles()</h2>
+        <div id="studyCycleStatus"></div>
+        <button onclick="testStudyCycle()">🔄 Testar StudyCycle</button>
+        <pre id="studyCycleResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>4️⃣ Logs de Debug</h2>
+        <button onclick="clearLogs()">🗑️ Limpar Logs</button>
+        <div id="debugLogs"></div>
+    </div>
+
+    <script type="module">
+        import { StudyCycle } from './js/study-cycle.js';
+        import { StorageManager } from './js/storage.js';
+
+        const API_BASE_URL = 'http://localhost:8000/api';
+        
+        let logs = [];
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ timestamp, message, type });
+            updateLogs();
+        }
+        
+        function updateLogs() {
+            const logsDiv = document.getElementById('debugLogs');
+            logsDiv.innerHTML = logs.map(log => `
+                <div class="log" style="border-left-color: ${log.type === 'error' ? '#e74c3c' : log.type === 'success' ? '#2ecc71' : '#3498db'}">
+                    <strong>[${log.timestamp}]</strong> ${log.message}
+                </div>
+            `).join('');
+        }
+        
+        window.clearLogs = () => {
+            logs = [];
+            updateLogs();
+        };
+
+        window.testAPI = async () => {
+            const status = document.getElementById('apiStatus');
+            const result = document.getElementById('apiResult');
+            
+            addLog('🌐 Testando API backend...', 'info');
+            status.innerHTML = '<div class="status">⏳ Testando API...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cycles`);
+                addLog(`API respondeu com status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                addLog(`API retornou ${data.length} ciclo(s)`, 'success');
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ API funcionando!<br>
+                        Ciclos encontrados: ${data.length}
+                    </div>
+                `;
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                addLog(`❌ Erro na API: ${error.message}`, 'error');
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro na API!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        window.testStorageManager = async () => {
+            const status = document.getElementById('storageStatus');
+            const result = document.getElementById('storageResult');
+            
+            addLog('📦 Testando StorageManager.getCycles()...', 'info');
+            status.innerHTML = '<div class="status">⏳ Testando StorageManager...</div>';
+            
+            try {
+                const cycles = await StorageManager.getCycles();
+                addLog(`StorageManager retornou ${cycles ? cycles.length : 0} ciclo(s)`, 'success');
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ StorageManager funcionando!<br>
+                        Ciclos: ${cycles ? cycles.length : 0}
+                    </div>
+                `;
+                result.textContent = JSON.stringify(cycles, null, 2);
+            } catch (error) {
+                addLog(`❌ Erro no StorageManager: ${error.message}`, 'error');
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro no StorageManager!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        window.testStudyCycle = async () => {
+            const status = document.getElementById('studyCycleStatus');
+            const result = document.getElementById('studyCycleResult');
+            
+            addLog('🔄 Testando StudyCycle.loadCycles()...', 'info');
+            status.innerHTML = '<div class="status">⏳ Testando StudyCycle...</div>';
+            
+            try {
+                const studyCycle = new StudyCycle();
+                addLog('StudyCycle criado', 'info');
+                
+                await studyCycle.loadCycles();
+                addLog(`loadCycles() concluído. Ciclos: ${studyCycle.cycles.length}`, 'success');
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ StudyCycle funcionando!<br>
+                        Ciclos carregados: ${studyCycle.cycles.length}<br>
+                        Ciclo ativo: ${studyCycle.activeCycleId}
+                    </div>
+                `;
+                result.textContent = JSON.stringify({
+                    cycles: studyCycle.cycles,
+                    activeCycleId: studyCycle.activeCycleId
+                }, null, 2);
+            } catch (error) {
+                addLog(`❌ Erro no StudyCycle: ${error.message}`, 'error');
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro no StudyCycle!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        // Executar testes automaticamente ao carregar
+        window.onload = async () => {
+            addLog('Página carregada', 'info');
+            await testAPI();
+            setTimeout(async () => {
+                await testStorageManager();
+                setTimeout(async () => {
+                    await testStudyCycle();
+                }, 500);
+            }, 500);
+        };
+    </script>
+</body>
+</html>

@@ -10,9 +10,9 @@ class CyclesApp {
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupEvents();
-        this.loadCycleSelector();
+        await this.loadCycleSelector();
         this.renderSubjectsList();
         this.updateCycleStats();
     }
@@ -77,9 +77,12 @@ class CyclesApp {
         });
     }
 
-    loadCycleSelector() {
+    async loadCycleSelector() {
         const select = document.getElementById('cycleSelect');
         if (!select) return;
+        
+        // Aguardar carregamento dos ciclos
+        await this.studyCycle.loadCycles();
         
         const cycles = this.studyCycle.cycles;
         const activeCycleId = this.studyCycle.activeCycleId;
@@ -143,7 +146,7 @@ class CyclesApp {
         modal?.close();
     }
 
-    saveCycleForm() {
+    async saveCycleForm() {
         const modal = document.getElementById('cycleFormModal');
         const nameInput = document.getElementById('cycleName');
         const name = nameInput.value.trim();
@@ -169,22 +172,22 @@ class CyclesApp {
             if (cycle) {
                 cycle.name = name;
                 cycle.studyDays = studyDays;
-                this.studyCycle.saveCycles();
+                await this.studyCycle.saveCycles();
                 alert('✅ Ciclo atualizado com sucesso!');
             }
         } else {
             // Criar novo ciclo
-            this.studyCycle.createCycle({ name, studyDays });
+            await this.studyCycle.createCycle({ name, studyDays });
             alert('✅ Ciclo criado com sucesso!');
         }
         
         this.closeCycleFormModal();
-        this.loadCycleSelector();
+        await this.loadCycleSelector();
         this.renderSubjectsList();
         this.updateCycleStats();
     }
 
-    deleteCycle() {
+    async deleteCycle() {
         const cycle = this.studyCycle.getActiveCycle();
         if (!cycle) {
             alert('Nenhum ciclo ativo para deletar');
@@ -195,15 +198,15 @@ class CyclesApp {
             return;
         }
         
-        this.studyCycle.deleteCycle(cycle.id);
+        await this.studyCycle.deleteCycle(cycle.id);
         alert('✅ Ciclo deletado com sucesso!');
         
-        this.loadCycleSelector();
+        await this.loadCycleSelector();
         this.renderSubjectsList();
         this.updateCycleStats();
     }
 
-    addSubject() {
+    async addSubject() {
         const nameInput = document.getElementById('subjectName');
         const weeklyHoursInput = document.getElementById('subjectWeeklyHours');
         const colorInput = document.getElementById('subjectColor');
@@ -228,18 +231,13 @@ class CyclesApp {
         
         if (editingId) {
             // Modo edição
-            const cycle = this.studyCycle.getActiveCycle();
-            if (cycle) {
-                const subject = cycle.subjects.find(s => s.id === editingId);
-                if (subject) {
-                    subject.name = name;
-                    subject.weeklyHours = weeklyHours;
-                    subject.color = colorInput.value;
-                    subject.priority = parseInt(prioritySelect.value);
-                    this.studyCycle.saveCycles();
-                    alert('✅ Disciplina atualizada com sucesso!');
-                }
-            }
+            await this.studyCycle.editSubject(editingId, {
+                name,
+                weeklyHours,
+                color: colorInput.value,
+                priority: parseInt(prioritySelect.value)
+            });
+            alert('✅ Disciplina atualizada com sucesso!');
             
             // Resetar botão
             submitBtn.textContent = '➕ Adicionar Disciplina';
@@ -345,7 +343,7 @@ class CyclesApp {
         this.updateCycleStats();
     }
 
-    removeSubject(subjectId) {
+    async removeSubject(subjectId) {
         const cycle = this.studyCycle.getActiveCycle();
         if (!cycle) return;
         
@@ -356,7 +354,7 @@ class CyclesApp {
             return;
         }
         
-        this.studyCycle.removeSubject(subjectId);
+        await this.studyCycle.removeSubject(subjectId);
         this.renderSubjectsList();
         this.updateCycleStats();
     }

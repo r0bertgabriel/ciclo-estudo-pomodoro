@@ -39,19 +39,27 @@ class PomodoroApp {
     /**
      * Inicializa a aplicação
      */
-    init() {
+    async init() {
         try {
             this.setupTimerEvents();
             this.setupUIEvents();
             this.setupCycleEvents();
             this.ui.setupSettingsInputs();
+            
+            // Carregar ciclos do backend ANTES de carregar o estado inicial
+            console.log('🔄 Carregando ciclos do backend...');
+            await this.studyCycle.loadCycles();
+            
+            const cycles = this.studyCycle.getAllCycles();
+            console.log('📊 Ciclos carregados:', cycles.length);
+            const activeCycle = this.studyCycle.getActiveCycle();
+            console.log('✅ Ciclo ativo:', activeCycle);
+            
             this.loadInitialState();
             this.requestNotifications();
             
             // Atualizar display do ciclo após carregamento
-            setTimeout(() => {
-                this.updateCycleDisplay();
-            }, 100);
+            this.updateCycleDisplay();
             
             console.log('🍅 Pomodoro Timer iniciado com sucesso!');
         } catch (error) {
@@ -1104,19 +1112,28 @@ class PomodoroApp {
      */
     updateSubjectSelector() {
         const select = document.getElementById('subjectSelect');
-        if (!select) return;
+        if (!select) {
+            console.warn('⚠️ Elemento subjectSelect não encontrado');
+            return;
+        }
 
         const cycle = this.studyCycle.getActiveCycle();
+        console.log('🔍 updateSubjectSelector - Ciclo ativo:', cycle);
+        
         if (!cycle) {
+            console.log('❌ Nenhum ciclo ativo encontrado');
             select.innerHTML = '<option value="">-- Nenhum ciclo ativo --</option>';
             return;
         }
+
+        console.log('✅ Ciclo ativo encontrado:', cycle.name, '- Disciplinas:', cycle.subjects?.length);
 
         // Limpar opções
         select.innerHTML = '<option value="">-- Escolha uma disciplina --</option>';
 
         // Adicionar disciplinas
         cycle.subjects.forEach(subject => {
+            console.log('  📖 Adicionando disciplina:', subject.name);
             const option = document.createElement('option');
             option.value = subject.id;
             option.textContent = subject.name;

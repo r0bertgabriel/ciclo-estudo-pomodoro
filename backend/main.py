@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional
 
-from database import Database
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from backend.database import Database
 
 app = FastAPI(title="Pomodoro API", version="1.0.0")
 

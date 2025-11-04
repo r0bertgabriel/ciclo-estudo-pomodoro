@@ -8,12 +8,11 @@ const API_BASE_URL = 'http://localhost:8000/api';
 
 export class StorageManager {
     /**
-     * Salva ciclos na API
-     * @param {string} key - Chave de armazenamento (será ignorada, mantida por compatibilidade)
+     * Salva dados no localStorage (SÍNCRONO)
+     * @param {string} key - Chave de armazenamento
      * @param {any} data - Dados a serem salvos
      */
-    static async save(key, data) {
-        // Por enquanto mantém localStorage como fallback
+    static save(key, data) {
         try {
             localStorage.setItem(key, JSON.stringify(data));
             return true;
@@ -24,13 +23,12 @@ export class StorageManager {
     }
 
     /**
-     * Carrega ciclos da API
-     * @param {string} key - Chave de armazenamento (será ignorada, mantida por compatibilidade)
+     * Carrega dados do localStorage (SÍNCRONO)
+     * @param {string} key - Chave de armazenamento
      * @param {any} defaultValue - Valor padrão caso não exista
      * @returns {any} Dados carregados ou valor padrão
      */
-    static async load(key, defaultValue = null) {
-        // Por enquanto mantém localStorage como fallback
+    static load(key, defaultValue = null) {
         try {
             const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : defaultValue;

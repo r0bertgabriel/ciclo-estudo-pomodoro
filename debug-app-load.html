@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug App Load</title>
+</head>
+<body>
+    <h1>Debug App Load</h1>
+    <div id="status">Carregando...</div>
+    <div id="logs" style="background: #f0f0f0; padding: 10px; margin-top: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+
+    <script type="module">
+        import { StudyCycle } from './js/study-cycle.js';
+        
+        const logsDiv = document.getElementById('logs');
+        const statusDiv = document.getElementById('status');
+        
+        // Capturar todos os console.log
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logsDiv.textContent += args.join(' ') + '\n';
+        };
+        
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logsDiv.textContent += 'WARN: ' + args.join(' ') + '\n';
+        };
+        
+        const originalError = console.error;
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logsDiv.textContent += 'ERROR: ' + args.join(' ') + '\n';
+        };
+        
+        async function testLoad() {
+            try {
+                console.log('=== Iniciando teste de carregamento ===');
+                
+                const studyCycle = new StudyCycle();
+                console.log('✅ StudyCycle instanciado');
+                
+                await studyCycle.loadCycles();
+                console.log('✅ loadCycles() concluído');
+                
+                const cycles = studyCycle.getAllCycles();
+                console.log('📊 Total de ciclos:', cycles.length);
+                console.log('📦 Ciclos:', JSON.stringify(cycles, null, 2));
+                
+                const activeCycle = studyCycle.getActiveCycle();
+                console.log('🎯 Ciclo ativo:', activeCycle);
+                
+                if (activeCycle) {
+                    console.log('  - Nome:', activeCycle.name);
+                    console.log('  - ID:', activeCycle.id);
+                    console.log('  - Disciplinas:', activeCycle.subjects?.length || 0);
+                    
+                    if (activeCycle.subjects) {
+                        activeCycle.subjects.forEach((s, i) => {
+                            console.log(`    ${i + 1}. ${s.name} (${s.weeklyHours}h)`);
+                        });
+                    }
+                    
+                    statusDiv.textContent = '✅ Sucesso! Ciclo ativo carregado.';
+                    statusDiv.style.color = 'green';
+                } else {
+                    statusDiv.textContent = '❌ Nenhum ciclo ativo encontrado';
+                    statusDiv.style.color = 'red';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                statusDiv.textContent = '❌ Erro: ' + error.message;
+                statusDiv.style.color = 'red';
+            }
+        }
+        
+        testLoad();
+    </script>
+</body>
+</html>

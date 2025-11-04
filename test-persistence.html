@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Persistência</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        h1 { color: #e74c3c; }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #c0392b; }
+        button.success { background: #2ecc71; }
+        button.success:hover { background: #27ae60; }
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #444;
+            max-height: 400px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.ok { background: #27ae60; }
+        .status.error { background: #e74c3c; }
+        .status.warning { background: #f39c12; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Persistência de Dados</h1>
+    
+    <div class="section">
+        <h2>1️⃣ Testar Criação de Ciclo</h2>
+        <div id="createStatus"></div>
+        <button onclick="testCreateCycle()">➕ Criar Ciclo de Teste</button>
+        <pre id="createResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣ Verificar Ciclos no Backend</h2>
+        <div id="listStatus"></div>
+        <button onclick="testListCycles()">📋 Listar Ciclos</button>
+        <pre id="listResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3️⃣ Adicionar Disciplina</h2>
+        <div id="subjectStatus"></div>
+        <button onclick="testCreateSubject()">📚 Adicionar Disciplina</button>
+        <pre id="subjectResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>4️⃣ Verificar Banco de Dados SQLite</h2>
+        <div id="dbStatus"></div>
+        <button onclick="checkDatabase()">🗄️ Verificar DB</button>
+        <pre id="dbResult"></pre>
+    </div>
+
+    <script type="module">
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        window.testCreateCycle = async () => {
+            const status = document.getElementById('createStatus');
+            const result = document.getElementById('createResult');
+            
+            status.innerHTML = '<div class="status">⏳ Criando ciclo...</div>';
+            
+            try {
+                const testCycle = {
+                    id: `test-${Date.now()}`,
+                    name: 'Ciclo de Teste - ' + new Date().toLocaleTimeString(),
+                    study_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+                    created_at: new Date().toISOString(),
+                    week_start_date: new Date().toISOString().split('T')[0],
+                    is_active: true
+                };
+                
+                console.log('Enviando para API:', testCycle);
+                
+                const response = await fetch(`${API_BASE_URL}/cycles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testCycle)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ Ciclo criado com sucesso!<br>
+                        ID: ${data.id}
+                    </div>
+                `;
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro ao criar ciclo!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        window.testListCycles = async () => {
+            const status = document.getElementById('listStatus');
+            const result = document.getElementById('listResult');
+            
+            status.innerHTML = '<div class="status">⏳ Carregando ciclos...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cycles`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ Ciclos carregados!<br>
+                        Total: ${data.length} ciclo(s)
+                    </div>
+                `;
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro ao carregar ciclos!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        window.testCreateSubject = async () => {
+            const status = document.getElementById('subjectStatus');
+            const result = document.getElementById('subjectResult');
+            
+            status.innerHTML = '<div class="status">⏳ Adicionando disciplina...</div>';
+            
+            try {
+                // Primeiro, pegar um ciclo
+                const cyclesResponse = await fetch(`${API_BASE_URL}/cycles`);
+                const cycles = await cyclesResponse.json();
+                
+                if (cycles.length === 0) {
+                    throw new Error('Nenhum ciclo encontrado! Crie um ciclo primeiro.');
+                }
+                
+                const cycleId = cycles[0].id;
+                
+                const testSubject = {
+                    id: `subject-${Date.now()}`,
+                    cycle_id: cycleId,
+                    name: 'Matemática - Teste ' + new Date().toLocaleTimeString(),
+                    weeklyHours: 4,
+                    color: '#3498db',
+                    priority: 1,
+                    currentWeekMinutes: 0,
+                    totalMinutes: 0,
+                    totalSessions: 0
+                };
+                
+                console.log('Enviando disciplina:', testSubject);
+                
+                const response = await fetch(`${API_BASE_URL}/subjects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testSubject)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                status.innerHTML = `
+                    <div class="status ok">
+                        ✅ Disciplina adicionada!<br>
+                        ID: ${data.id}<br>
+                        Ciclo: ${cycleId}
+                    </div>
+                `;
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                status.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro ao adicionar disciplina!<br>
+                        ${error.message}
+                    </div>
+                `;
+                result.textContent = error.stack;
+            }
+        };
+
+        window.checkDatabase = async () => {
+            const status = document.getElementById('dbStatus');
+            const result = document.getElementById('dbResult');
+            
+            status.innerHTML = `
+                <div class="status warning">
+                    ⚠️ Para verificar o banco de dados SQLite diretamente, execute no terminal:<br>
+                    <code style="background: #000; padding: 5px; display: block; margin-top: 10px;">
+                    sqlite3 pomodoro.db "SELECT * FROM cycles;"
+                    </code>
+                </div>
+            `;
+            
+            result.textContent = `Para verificar o banco de dados, use:
+
+sqlite3 pomodoro.db "SELECT id, name, is_active FROM cycles;"
+sqlite3 pomodoro.db "SELECT id, name, cycle_id FROM subjects;"
+
+Ou verifique se o arquivo pomodoro.db existe:
+ls -lh pomodoro.db`;
+        };
+
+        // Executar testes ao carregar
+        window.onload = () => {
+            testListCycles();
+        };
+    </script>
+</body>
+</html>
