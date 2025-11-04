@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerenciamento de Ciclos de Estudos">
+    <title>Ciclos de Estudos - Pomodoro</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="ciclos.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+    <div id="cyclesApp">
+        <!-- Header -->
+        <header class="cycles-header">
+            <div class="cycles-header-content">
+                <h1>🔄 Gerenciamento de Ciclos de Estudos</h1>
+                <div class="header-actions">
+                    <a href="index.html" class="header-btn">
+                        ⏱️ <span class="header-btn-text">Ir para Pomodoro</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="cycles-main">
+            <!-- Cycle Selector and Management -->
+            <section class="cycle-management-section">
+                <h3>⚙️ Gerenciamento de Ciclo</h3>
+                <div class="cycle-selector-row">
+                    <div class="cycle-select-group">
+                        <label for="cycleSelect">Ciclo Ativo:</label>
+                        <select id="cycleSelect" class="cycle-select">
+                            <option value="">Carregando...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="cycle-actions-row">
+                    <button type="button" class="control-btn primary small" id="newCycleBtn">
+                        ➕ Novo Ciclo
+                    </button>
+                    <button type="button" class="control-btn secondary small" id="editCycleBtn">
+                        ✏️ Editar
+                    </button>
+                    <button type="button" class="control-btn danger small" id="deleteCycleBtn">
+                        🗑️ Deletar
+                    </button>
+                </div>
+            </section>
+
+            <!-- Add Subject Form -->
+            <section class="cycle-form-section">
+                <h3>📝 Adicionar Disciplina</h3>
+                <p class="form-description">Preencha os dados abaixo para adicionar uma nova disciplina ao seu ciclo de estudos. Os campos marcados com <span style="color: var(--current-primary); font-weight: 700;">*</span> são obrigatórios.</p>
+                <form id="addSubjectForm" class="cycle-form">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="subjectName">Nome da Disciplina *</label>
+                            <input type="text" id="subjectName" placeholder="Ex: Matemática, Física..." required>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="subjectWeeklyHours">⏰ Horas Semanais *</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="subjectWeeklyHours" min="1" max="40" value="2" required>
+                                <span class="input-unit">h/semana</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="subjectColor">🎨 Cor de Identificação</label>
+                            <input type="color" id="subjectColor" value="#3498db">
+                        </div>
+                        
+                        <div class="form-field">
+                            <label for="subjectPriority">Prioridade</label>
+                            <select id="subjectPriority">
+                                <option value="1">🔴 Alta (1)</option>
+                                <option value="2">🟠 Média-Alta (2)</option>
+                                <option value="3" selected>🟡 Média (3)</option>
+                                <option value="4">🟢 Média-Baixa (4)</option>
+                                <option value="5">🔵 Baixa (5)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="control-btn primary">
+                            ➕ Adicionar Disciplina
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Subjects List -->
+            <section class="cycle-list-section">
+                <h3>📚 Disciplinas no Ciclo</h3>
+                <div id="subjectsList" class="subjects-list">
+                    <p class="cycle-empty">Nenhuma disciplina adicionada ainda.</p>
+                </div>
+            </section>
+
+            <!-- Cycle Stats -->
+            <section class="cycle-stats-section">
+                <h3>📊 Estatísticas Semanais</h3>
+                <div id="cycleStats" class="cycle-stats-grid"></div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="cycles-footer">
+            <button type="button" class="control-btn secondary" id="exportCycle">
+                💾 Exportar Ciclo
+            </button>
+            <button type="button" class="control-btn secondary" id="importCycle">
+                📂 Importar Ciclo
+            </button>
+        </footer>
+    </div>
+
+    <!-- Cycle Form Modal (reused from main app) -->
+    <dialog class="modal" id="cycleFormModal" aria-labelledby="cycleFormModalTitle">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="cycleFormModalTitle">Criar Novo Ciclo</h2>
+                <button class="close-btn" id="closeCycleFormModal" aria-label="Fechar">&times;</button>
+            </header>
+            
+            <form id="cycleForm" class="modal-body">
+                <div class="setting-item">
+                    <label for="cycleName">Nome do Ciclo</label>
+                    <input type="text" id="cycleName" placeholder="Ex: Vestibular 2024" required>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Dias de Estudo</label>
+                    <div class="days-selector">
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="mon" checked>
+                            <span>Seg</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="tue" checked>
+                            <span>Ter</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="wed" checked>
+                            <span>Qua</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="thu" checked>
+                            <span>Qui</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="fri" checked>
+                            <span>Sex</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="sat">
+                            <span>Sáb</span>
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="studyDays" value="sun">
+                            <span>Dom</span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+            
+            <footer class="modal-footer">
+                <button type="button" class="control-btn secondary" id="cancelCycleForm">
+                    Cancelar
+                </button>
+                <button type="submit" form="cycleForm" class="control-btn primary">
+                    Salvar Ciclo
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <script type="module" src="js/ciclos.js"></script>
+</body>
+</html>

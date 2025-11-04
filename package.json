@@ -1,0 +1,13 @@
+{
+  "name": "pomodoro-boladao",
+  "version": "1.0.0",
+  "description": "Aplicativo Pomodoro moderno e customizável",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["pomodoro", "timer", "productivity"],
+  "author": "",
+  "license": "MIT"
+}

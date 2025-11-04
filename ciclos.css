@@ -1,0 +1,105 @@
+/* Cycles Page Specific Styles */
+
+#cyclesApp {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+}
+
+.cycles-header {
+    background: linear-gradient(135deg, var(--color-card) 0%, var(--color-bg) 100%);
+    border-bottom: 2px solid var(--color-border);
+    padding: var(--spacing-lg) 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cycles-header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.cycles-header h1 {
+    font-size: 1.8rem;
+    color: var(--color-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.cycles-main {
+    flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.cycles-footer {
+    background: var(--color-card);
+    border-top: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+/* Enhanced subject list for full page view */
+.subjects-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: var(--spacing-lg);
+    max-height: none;
+}
+
+.subject-item {
+    min-height: 100px;
+}
+
+/* Enhanced stats grid */
+.cycle-stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cycles-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .cycles-main {
+        padding: var(--spacing-md);
+    }
+    
+    .subjects-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .cycle-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .cycles-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .cycles-header-content {
+        padding: 0 var(--spacing-md);
+    }
+}

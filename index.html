@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicativo Pomodoro moderno e customizável">
+    <meta name="theme-color" content="#e74c3c">
+    
+    <title>Pomodoro Boladão</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="focus-mode">
+    <div id="app">
+        <header class="app-header">
+            <h1 class="app-title">
+                <span class="emoji">🍅</span>
+                <span>Pomodoro Boladão</span>
+            </h1>
+            <div class="header-actions">
+                <a href="ciclos.html" class="header-btn" aria-label="Gerenciar Ciclos de Estudo" title="Gerenciar Ciclos de Estudo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                    </svg>
+                    <span class="header-btn-text">Ciclos</span>
+                </a>
+                <button class="header-btn" id="settingsBtn" aria-label="Configurações do Timer" title="Configurações do Timer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m4.22-13.22l-1.42 1.42M10.2 13.8l-1.42 1.42m0-10.44l1.42 1.42m4.36 4.36l1.42 1.42M1 12h6m6 0h6"></path>
+                    </svg>
+                    <span class="header-btn-text">Config</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Timer Card -->
+            <section class="timer-card" role="region" aria-label="Timer principal">
+                <!-- Mode Selector -->
+                <nav class="mode-selector" role="tablist" aria-label="Modos do timer">
+                    <button class="mode-btn active" data-mode="focus" role="tab" aria-selected="true">
+                        Foco
+                    </button>
+                    <button class="mode-btn" data-mode="shortBreak" role="tab" aria-selected="false">
+                        Pausa Curta
+                    </button>
+                    <button class="mode-btn" data-mode="longBreak" role="tab" aria-selected="false">
+                        Pausa Longa
+                    </button>
+                </nav>
+
+                <!-- Subject Selector (visible only in focus mode) -->
+                <div class="subject-selector" id="subjectSelector" style="display: none;">
+                    <div class="subject-selector-header">
+                        <span class="subject-icon">📚</span>
+                        <label for="subjectSelect">Escolha a disciplina que você vai estudar agora:</label>
+                    </div>
+                    <select id="subjectSelect" class="subject-select">
+                        <option value="">-- Selecione uma disciplina --</option>
+                    </select>
+                    <div class="subject-info-display" id="subjectInfo" style="display: none;">
+                        <div class="subject-progress-info">
+                            <div class="progress-text">
+                                <span class="progress-label">Progresso Semanal:</span>
+                                <span class="progress-values">
+                                    <strong id="timeStudied">0h</strong> de <strong id="timeGoal">0h</strong>
+                                    <span id="timeRemaining" class="time-remaining"></span>
+                                </span>
+                            </div>
+                            <div class="subject-progress-bar">
+                                <div class="progress-fill" id="subjectProgressFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="timer-display">
+                    <!-- Time -->
+                    <time class="time" id="timeDisplay" datetime="PT25M">25:00</time>
+
+                    <!-- Motivation Quote -->
+                    <p class="motivation-quote" id="motivationQuote" role="status" aria-live="polite">
+                        Pronto para mais uma rodada de auto-ilusão? Vamos lá!
+                    </p>
+
+                    <!-- Session Info -->
+                    <div class="session-info">
+                        <span id="sessionCount">Sessão 1 de 4</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="timer-controls">
+                    <button class="control-btn primary" id="startBtn" aria-label="Iniciar timer">
+                        <span>Iniciar</span>
+                    </button>
+                    <button class="control-btn secondary" id="resetBtn" aria-label="Reiniciar timer">
+                        <span>Reiniciar</span>
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section" role="region" aria-label="Estatísticas">
+                <h2 class="stats-title">Estatísticas de Hoje</h2>
+                <div class="stats-grid">
+                    <article class="stat-card">
+                        <div class="stat-value" id="completedSessions">0</div>
+                        <div class="stat-label">Sessões Completas</div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-value" id="totalTime">0h 0m</div>
+                        <div class="stat-label">Tempo Total</div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Study Cycle Section -->
+            <section class="cycle-section" id="cycleSection" role="region" aria-label="Ciclo de Estudos" style="display: none;">
+                <div class="cycle-header">
+                    <h2 class="cycle-title">📚 Disciplina Atual</h2>
+                    <div class="cycle-current" id="currentSubject">
+                        <span class="cycle-empty">Nenhum ciclo configurado</span>
+                    </div>
+                </div>
+                
+                <div class="cycle-navigation">
+                    <button class="control-btn secondary small" id="prevSubject" aria-label="Disciplina anterior">
+                        ← Anterior
+                    </button>
+                    <button class="control-btn primary small" id="nextSubject" aria-label="Próxima disciplina">
+                        Próxima →
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <dialog class="modal" id="settingsModal" aria-labelledby="modalTitle">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="modalTitle">Configurações</h2>
+                <button class="close-btn" id="closeModal" aria-label="Fechar configurações">&times;</button>
+            </header>
+            
+            <form class="modal-body" id="settingsForm">
+                <fieldset class="settings-group">
+                    <legend>Tempos</legend>
+                    
+                    <div class="setting-item">
+                        <label for="focusTime">
+                            <span>Tempo de Foco</span>
+                            <output class="setting-value" id="focusValue">25</output> min
+                        </label>
+                        <input type="range" id="focusTime" name="focusTime" min="1" max="60" value="25" step="1">
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="shortBreakTime">
+                            <span>Pausa Curta</span>
+                            <output class="setting-value" id="shortBreakValue">5</output> min
+                        </label>
+                        <input type="range" id="shortBreakTime" name="shortBreakTime" min="1" max="30" value="5" step="1">
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="longBreakTime">
+                            <span>Pausa Longa</span>
+                            <output class="setting-value" id="longBreakValue">15</output> min
+                        </label>
+                        <input type="range" id="longBreakTime" name="longBreakTime" min="1" max="60" value="15" step="1">
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="sessionsBeforeLongBreak">
+                            <span>Sessões antes da Pausa Longa</span>
+                            <output class="setting-value" id="sessionsValue">4</output>
+                        </label>
+                        <input type="range" id="sessionsBeforeLongBreak" name="sessionsBeforeLongBreak" min="2" max="8" value="4" step="1">
+                    </div>
+                </fieldset>
+
+                <fieldset class="settings-group">
+                    <legend>Comportamento</legend>
+                    
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" id="autoStartBreaks" name="autoStartBreaks" checked>
+                            <span>Iniciar pausas automaticamente</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" id="autoStartPomodoros" name="autoStartPomodoros">
+                            <span>Iniciar pomodoros automaticamente</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" id="notifications" name="notifications" checked>
+                            <span>Ativar notificações</span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="settings-group">
+                    <legend>Som</legend>
+                    
+                    <div class="setting-item">
+                        <label for="alarmSound">Som de Alarme</label>
+                        <select id="alarmSound" name="alarmSound">
+                            <option value="bell">🔔 Sino</option>
+                            <option value="chime">🎵 Carrilhão</option>
+                            <option value="digital">💻 Digital</option>
+                            <option value="none">🔇 Nenhum</option>
+                        </select>
+                    </div>
+                </fieldset>
+            </form>
+            
+            <footer class="modal-footer">
+                <button type="button" class="control-btn secondary" id="resetStats">
+                    Limpar Estatísticas
+                </button>
+                                <button type="submit" form="settingsForm" class="control-btn primary" id="saveSettings">
+                    Salvar
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Scripts -->
+    <script>
+        console.log('🌟 HTML carregado, iniciando scripts...');
+        console.log('🌟 Verificando suporte a módulos ES6...');
+        window.addEventListener('error', (e) => {
+            console.error('❌ Erro global capturado:', e.error || e.message);
+        });
+    </script>
+    <script type="module" src="./js/app.js"></script>
+    <script nomodule>
+        console.error('❌ Navegador não suporta módulos ES6!');
+        alert('Seu navegador não suporta módulos ES6. Por favor, use um navegador moderno.');
+    </script>
+</body>
+</html>
+
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Study Cycle Modal -->
+    <dialog class="modal modal-large" id="cycleModal" aria-labelledby="cycleModalTitle">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="cycleModalTitle">🔄 Gerenciar Ciclos de Estudos</h2>
+                <button class="close-btn" id="closeCycleModal" aria-label="Fechar">&times;</button>
+            </header>
+            
+            <div class="modal-body">
+                <!-- Cycle Selector and Management -->
+                <div class="cycle-management-section">
+                    <h3>⚙️ Gerenciamento de Ciclo</h3>
+                    <div class="cycle-selector-row">
+                        <div class="cycle-select-group">
+                            <label for="cycleSelect">
+                                Ciclo Ativo:
+                            </label>
+                            <select id="cycleSelect" class="cycle-select">
+                                <option value="">Carregando...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="cycle-actions-row">
+                        <button type="button" class="control-btn primary small" id="newCycleBtn">
+                            ➕ Novo Ciclo
+                        </button>
+                        <button type="button" class="control-btn secondary small" id="editCycleBtn">
+                            ✏️ Editar
+                        </button>
+                        <button type="button" class="control-btn danger small" id="deleteCycleBtn">
+                            🗑️ Deletar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Subject Form -->
+                <div class="cycle-form-section">
+                    <h3>📝 Adicionar Disciplina</h3>
+                    <p class="form-description">Preencha os dados abaixo para adicionar uma nova disciplina ao seu ciclo de estudos. Os campos marcados com <span style="color: var(--current-primary); font-weight: 700;">*</span> são obrigatórios.</p>
+                    <form id="addSubjectForm" class="cycle-form">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="subjectName">Nome da Disciplina *</label>
+                                <input type="text" id="subjectName" placeholder="Ex: Matemática, Física..." required>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="subjectWeeklyHours">
+                                    ⏰ Horas Semanais *
+                                </label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="subjectWeeklyHours" min="1" max="40" value="2" required>
+                                    <span class="input-unit">h/semana</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="subjectColor">
+                                    🎨 Cor de Identificação
+                                </label>
+                                <input type="color" id="subjectColor" value="#3498db">
+                            </div>
+                            
+                            <div class="form-field">
+                                <label for="subjectPriority">
+                                    Prioridade
+                                </label>
+                                <select id="subjectPriority">
+                                    <option value="1">🔴 Alta (1)</option>
+                                    <option value="2">🟠 Média-Alta (2)</option>
+                                    <option value="3" selected>🟡 Média (3)</option>
+                                    <option value="4">🟢 Média-Baixa (4)</option>
+                                    <option value="5">🔵 Baixa (5)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="control-btn primary">
+                                ➕ Adicionar Disciplina
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Subjects List -->
+                <div class="cycle-list-section">
+                    <h3>📚 Disciplinas no Ciclo</h3>
+                    <div id="subjectsList" class="subjects-list">
+                        <p class="cycle-empty">Nenhuma disciplina adicionada ainda.</p>
+                    </div>
+                </div>
+
+                <!-- Cycle Stats -->
+                <div class="cycle-stats-section">
+                    <h3>📊 Estatísticas Semanais</h3>
+                    <div id="cycleStats" class="cycle-stats-grid"></div>
+                </div>
+            </div>
+            
+            <footer class="modal-footer">
+                <button type="button" class="control-btn secondary" id="exportCycle">
+                    Exportar Ciclo
+                </button>
+                <button type="button" class="control-btn secondary" id="importCycle">
+                    Importar Ciclo
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- New/Edit Cycle Modal -->
+    <dialog class="modal" id="cycleFormModal">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="cycleFormTitle">Novo Ciclo de Estudos</h2>
+                <button class="close-btn" id="closeCycleFormModal" aria-label="Fechar">&times;</button>
+            </header>
+            
+            <div class="modal-body">
+                <form id="cycleForm" class="settings-form">
+                    <div class="form-group">
+                        <label for="cycleName">Nome do Ciclo:</label>
+                        <input type="text" id="cycleName" placeholder="Ex: ENEM 2025" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dias da semana para estudo:</label>
+                        <div class="days-selector">
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="mon" checked>
+                                <span>Seg</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="tue" checked>
+                                <span>Ter</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="wed" checked>
+                                <span>Qua</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="thu" checked>
+                                <span>Qui</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="fri" checked>
+                                <span>Sex</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="sat">
+                                <span>Sáb</span>
+                            </label>
+                            <label class="day-checkbox">
+                                <input type="checkbox" name="studyDays" value="sun">
+                                <span>Dom</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <footer class="modal-footer">
+                <button type="button" class="control-btn secondary" id="cancelCycleForm">Cancelar</button>
+                <button type="submit" form="cycleForm" class="control-btn primary">Salvar</button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Scripts -->
+    <script>
+        console.log('🌟 HTML carregado, iniciando scripts...');
+        console.log('🌟 Verificando suporte a módulos ES6...');
+        window.addEventListener('error', (e) => {
+            console.error('❌ Erro global capturado:', e.error || e.message);
+        });
+    </script>
+    <script type="module" src="./js/app.js"></script>
+    <script nomodule>
+        console.error('❌ Navegador não suporta módulos ES6!');
+        alert('Seu navegador não suporta módulos ES6. Por favor, use um navegador moderno.');
+    </script>
+</body>
+</html>
