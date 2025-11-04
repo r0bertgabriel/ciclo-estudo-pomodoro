@@ -1,5 +1,13 @@
 # 🍅 Pomodoro Boladão - Timer com Ciclos de Estudo
 
+## 🖼️ Galeria Pomodoro
+
+<div align="center">
+   <img src="public/foco.png" alt="Foco Pomodoro" width="220"/>
+   <img src="public/curta.png" alt="Pausa Curta" width="220"/>
+   <img src="public/longa.png" alt="Pausa Longa" width="220"/>
+</div>
+
 Sistema completo de Pomodoro Timer integrado com gerenciamento de ciclos de estudos, controle semanal de horas por disciplina e persistência em banco de dados SQLite.
 
 > **✨ Novidades:**  
