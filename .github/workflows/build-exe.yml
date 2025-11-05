@@ -33,7 +33,7 @@ jobs:
         pyinstaller --onefile --windowed --name="Pomodoro" --icon=NONE launcher.py
     
     - name: Upload executable as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pomodoro-Windows-exe
         path: dist/Pomodoro.exe
