@@ -1,5 +1,7 @@
 # 🍅 Pomodoro Boladão - Timer com Ciclos de Estudo
 
+[![Build Windows Executable](https://github.com/r0bertgabriel/ciclo-estudo-pomodoro/actions/workflows/build-exe.yml/badge.svg)](https://github.com/r0bertgabriel/ciclo-estudo-pomodoro/actions/workflows/build-exe.yml)
+
 ## 🖼️ Galeria Pomodoro
 
 <div align="center">

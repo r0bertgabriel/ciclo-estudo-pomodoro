@@ -7,7 +7,53 @@
 
 ---
 
-## 🚀 MÉTODO 1: Automático (Recomendado)
+## 🤖 MÉTODO 0: GitHub Actions (Recomendado para Desenvolvimento no Linux)
+
+**Se você está desenvolvendo no Linux mas precisa do .exe para Windows**, o GitHub Actions fará o build automaticamente!
+
+### Como funciona:
+
+1. **Faça commit e push das suas mudanças:**
+   ```bash
+   git add .
+   git commit -m "Atualização do projeto"
+   git push origin main
+   ```
+
+2. **O GitHub Actions automaticamente:**
+   - Detecta o push
+   - Executa em um ambiente Windows
+   - Compila o executável `.exe`
+   - Salva como artifact
+
+3. **Baixe o executável:**
+   - Vá para: https://github.com/r0bertgabriel/ciclo-estudo-pomodoro/actions
+   - Clique no workflow mais recente
+   - Baixe o artifact "Pomodoro-Windows-exe"
+   - Extraia o `Pomodoro.exe`
+
+### Para criar uma Release com o .exe:
+
+```bash
+# Crie uma tag de versão
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+O GitHub Actions automaticamente criará uma Release com o `Pomodoro.exe` anexado!
+
+### ⚠️ Importante sobre PyInstaller:
+
+**PyInstaller cria executáveis NATIVOS do sistema operacional:**
+- **Linux** → Gera binário Linux (sem extensão)
+- **Windows** → Gera `Pomodoro.exe`
+- **macOS** → Gera app macOS
+
+**Não é possível criar .exe no Linux diretamente!** Por isso o GitHub Actions é a melhor solução.
+
+---
+
+## 🚀 MÉTODO 1: Automático (Scripts Locais)
 
 ### Windows:
 
