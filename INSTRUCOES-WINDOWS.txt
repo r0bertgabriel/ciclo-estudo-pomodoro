@@ -124,10 +124,10 @@ Você precisará de 2 janelas do Prompt de Comando:
 
 1. Abra o Prompt de Comando
 
-2. Execute:
+2. Execute (DO DIRETÓRIO RAIZ DO PROJETO):
 
-   cd Desktop\ciclo-estudo-pomodoro\backend
-   python -m uvicorn main:app --reload --port 8000
+   cd Desktop\ciclo-estudo-pomodoro
+   python -m uvicorn backend.main:app --reload --port 8000
 
 3. Aguarde aparecer: "Application startup complete"
 

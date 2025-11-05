@@ -34,10 +34,8 @@ mkdir -p logs
 # Iniciar o backend em background
 echo ""
 echo "🚀 Iniciando backend (FastAPI) na porta 8000..."
-cd backend
-python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 > ../logs/backend.log 2>&1 &
+python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 > logs/backend.log 2>&1 &
 BACKEND_PID=$!
-cd ..
 
 # Aguardar backend iniciar
 echo "⏳ Aguardando backend inicializar..."

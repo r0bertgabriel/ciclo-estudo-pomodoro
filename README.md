@@ -91,9 +91,8 @@ pip3 install -r backend/requirements.txt
 ./start-all.sh
 
 # Opção 2: Iniciar manualmente
-# Terminal 1 - Backend
-cd backend
-python3 -m uvicorn main:app --reload --port 8000
+# Terminal 1 - Backend (executar do diretório raiz)
+python3 -m uvicorn backend.main:app --reload --port 8000
 
 # Terminal 2 - Frontend
 python3 -m http.server 8080
@@ -149,10 +148,9 @@ start.bat
 
 **Opção 2: Iniciar manualmente**
 
-Terminal 1 - Backend:
+Terminal 1 - Backend (executar do diretório raiz):
 ```batch
-cd backend
-python -m uvicorn main:app --reload --port 8000
+python -m uvicorn backend.main:app --reload --port 8000
 ```
 
 Terminal 2 - Frontend:

@@ -5,7 +5,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from backend.database import Database
+# Import compatível com Windows e Linux
+try:
+    from backend.database import Database
+except ModuleNotFoundError:
+    from database import Database
 
 app = FastAPI(title="Pomodoro API", version="1.0.0")
 

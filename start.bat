@@ -35,7 +35,7 @@ if not exist logs mkdir logs
 
 REM Iniciar backend (FastAPI)
 echo 🚀 Iniciando backend na porta 8000...
-start "Backend - Pomodoro API" cmd /k "cd backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+start "Backend - Pomodoro API" cmd /k "python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000"
 
 REM Aguardar backend inicializar
 timeout /t 3 /nobreak >nul
