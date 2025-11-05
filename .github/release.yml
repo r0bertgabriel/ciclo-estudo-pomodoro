@@ -1,0 +1,49 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - dependencies
+    authors:
+      - dependabot
+  categories:
+    - title: 🚀 Novas Funcionalidades
+      labels:
+        - feature
+        - enhancement
+        - new
+    - title: 🐛 Correções de Bugs
+      labels:
+        - bug
+        - fix
+        - bugfix
+    - title: 📚 Documentação
+      labels:
+        - documentation
+        - docs
+    - title: 🎨 Melhorias de Interface
+      labels:
+        - ui
+        - ux
+        - design
+    - title: ⚡ Performance
+      labels:
+        - performance
+        - optimization
+    - title: 🔧 Manutenção
+      labels:
+        - maintenance
+        - refactor
+        - chore
+    - title: 🧪 Testes
+      labels:
+        - test
+        - testing
+    - title: 🔒 Segurança
+      labels:
+        - security
+    - title: 📦 Dependências
+      labels:
+        - dependencies
+    - title: 🔄 Outras Mudanças
+      labels:
+        - "*"

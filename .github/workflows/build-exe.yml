@@ -39,12 +39,49 @@ jobs:
         path: dist/Pomodoro.exe
         retention-days: 90
     
+    - name: Generate Changelog
+      if: startsWith(github.ref, 'refs/tags/')
+      id: changelog
+      run: |
+        # Pegar a tag anterior
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | sed -n '2p')
+        CURRENT_TAG=${GITHUB_REF#refs/tags/}
+        
+        echo "## 🎉 Release ${CURRENT_TAG}" > CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 📦 Download" >> CHANGELOG.md
+        echo "Baixe o executável Windows abaixo em **Assets**." >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        
+        if [ -z "$PREVIOUS_TAG" ]; then
+          echo "### 📝 Alterações" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          git log --pretty=format:"- %s (%h)" >> CHANGELOG.md
+        else
+          echo "### 📝 Alterações desde ${PREVIOUS_TAG}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
+        fi
+        
+        echo "" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 👥 Contribuidores" >> CHANGELOG.md
+        git log ${PREVIOUS_TAG}..HEAD --format='%aN' | sort -u | sed 's/^/- @/' >> CHANGELOG.md || echo "- @r0bertgabriel" >> CHANGELOG.md
+        
+        # Ler o changelog para usar no release
+        CHANGELOG_CONTENT=$(cat CHANGELOG.md)
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
     - name: Create Release (only on tags)
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: dist/Pomodoro.exe
+        body: ${{ steps.changelog.outputs.changelog }}
         draft: false
         prerelease: false
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
