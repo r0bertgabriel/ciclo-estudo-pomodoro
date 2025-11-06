@@ -1749,6 +1749,130 @@ select:focus {
     }
 }
 
+/* ==================== Health Reminders ==================== */
+.health-reminders-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    color: white;
+    margin-top: var(--spacing-lg);
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reminders-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+.water-reminder {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: var(--spacing-lg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.water-icon {
+    font-size: 2rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.water-text {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.exercises-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.exercise-card {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    backdrop-filter: blur(10px);
+    transition: all var(--transition-normal);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.exercise-card:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(5px);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.exercise-icon {
+    font-size: 2rem;
+    min-width: 40px;
+}
+
+.exercise-content {
+    flex: 1;
+}
+
+.exercise-title {
+    margin: 0 0 0.4rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.exercise-description {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+.exercise-duration {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.template-info {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.template-info small {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
 /* ==================== Print ==================== */
 @media print {
     body {
@@ -1758,7 +1882,30 @@ select:focus {
     
     .icon-btn,
     .control-btn,
-    .modal {
+    .modal,
+    .health-reminders-section {
         display: none;
     }
 }
+
+/* ==================== Responsive Health Reminders ==================== */
+@media (max-width: 768px) {
+    .health-reminders-section {
+        padding: 1rem;
+    }
+    
+    .exercise-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .water-reminder {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .exercise-icon {
+        min-width: auto;
+    }
+}
+

@@ -404,3 +404,293 @@ class Database:
         conn.commit()
         conn.close()
         return True
+    
+    # ===== ANALYTICS & DASHBOARD =====
+    
+    def get_general_stats(self):
+        """Retorna estatísticas gerais"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Total de minutos estudados
+        cursor.execute('SELECT SUM(minutes) FROM study_sessions')
+        total_minutes = cursor.fetchone()[0] or 0
+        
+        # Total de sessões
+        cursor.execute('SELECT COUNT(*) FROM study_sessions')
+        total_sessions = cursor.fetchone()[0] or 0
+        
+        # Total de disciplinas
+        cursor.execute('SELECT COUNT(DISTINCT subject_id) FROM study_sessions')
+        total_subjects = cursor.fetchone()[0] or 0
+        
+        # Sequência de dias consecutivos (streak)
+        cursor.execute('''
+            SELECT DISTINCT DATE(started_at) as study_date 
+            FROM study_sessions 
+            ORDER BY study_date DESC
+        ''')
+        dates = [row[0] for row in cursor.fetchall()]
+        
+        current_streak = 0
+        if dates:
+            from datetime import timedelta
+            today = datetime.now().date()
+            
+            for i, date_str in enumerate(dates):
+                date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                expected_date = today - timedelta(days=i)
+                
+                if date == expected_date:
+                    current_streak += 1
+                else:
+                    break
+        
+        conn.close()
+        
+        return {
+            'totalMinutes': total_minutes,
+            'totalSessions': total_sessions,
+            'totalSubjects': total_subjects,
+            'currentStreak': current_streak
+        }
+    
+    def get_chart_data(self, period='week', subject_id='all'):
+        """Retorna dados para gráficos"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Determinar período
+        from datetime import timedelta
+        
+        if period == 'week':
+            days = 7
+        elif period == 'month':
+            days = 30
+        else:
+            days = 365
+        
+        start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+        
+        # Query base
+        query = '''
+            SELECT DATE(started_at) as date, SUM(minutes) as total_minutes
+            FROM study_sessions
+            WHERE started_at >= ?
+        '''
+        params = [start_date]
+        
+        if subject_id != 'all':
+            query += ' AND subject_id = ?'
+            params.append(subject_id)
+        
+        query += ' GROUP BY DATE(started_at) ORDER BY date'
+        
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+        
+        conn.close()
+        
+        # Formatar dados
+        labels = []
+        data = []
+        
+        for row in results:
+            date = datetime.strptime(row[0], '%Y-%m-%d')
+            labels.append(date.strftime('%d/%m'))
+            data.append(row[1] / 60)  # Converter para horas
+        
+        return {
+            'evolution': {
+                'labels': labels,
+                'datasets': [{
+                    'label': 'Horas de Estudo',
+                    'data': data,
+                    'borderColor': '#667eea',
+                    'backgroundColor': 'rgba(102, 126, 234, 0.1)',
+                    'borderWidth': 3,
+                    'fill': True,
+                    'tension': 0.4
+                }]
+            },
+            'subjects': None  # TODO: Implementar gráfico por disciplina
+        }
+    
+    def get_heatmap_data(self):
+        """Retorna dados para heatmap de atividade"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Buscar sessões dos últimos 30 dias
+        from datetime import timedelta
+        start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+        
+        cursor.execute('''
+            SELECT started_at, minutes
+            FROM study_sessions
+            WHERE started_at >= ?
+        ''', (start_date,))
+        
+        sessions = cursor.fetchall()
+        conn.close()
+        
+        # Criar matriz 7 dias x 17 horas (6h-22h)
+        heatmap = [[0 for _ in range(17)] for _ in range(7)]
+        
+        for session in sessions:
+            dt = datetime.fromisoformat(session[0])
+            day_of_week = dt.weekday()  # 0 = Segunda
+            hour = dt.hour
+            
+            if 6 <= hour <= 22:
+                hour_index = hour - 6
+                heatmap[day_of_week][hour_index] += session[1] // 15  # Intensidade
+        
+        return heatmap
+    
+    def get_study_patterns(self):
+        """Retorna análise de padrões de estudo"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        from collections import defaultdict
+        
+        # Buscar todas as sessões
+        cursor.execute('''
+            SELECT started_at, minutes
+            FROM study_sessions
+        ''')
+        sessions = cursor.fetchall()
+        
+        if not sessions:
+            conn.close()
+            return {
+                'bestTime': '14:00 - 16:00',
+                'bestTimeMinutes': 0,
+                'bestDay': 'Segunda-feira',
+                'bestDayMinutes': 0,
+                'avgDuration': 25,
+                'completionRate': 0
+            }
+        
+        # Análise por horário
+        hour_stats = defaultdict(int)
+        day_stats = defaultdict(int)
+        durations = []
+        
+        for session in sessions:
+            dt = datetime.fromisoformat(session[0])
+            hour = dt.hour
+            day = dt.weekday()
+            minutes = session[1]
+            
+            hour_stats[hour] += minutes
+            day_stats[day] += minutes
+            durations.append(minutes)
+        
+        # Melhor horário (intervalo de 2 horas)
+        best_hour = max(hour_stats.keys(), key=lambda x: hour_stats[x]) if hour_stats else 14
+        best_time = f"{best_hour}:00 - {best_hour + 2}:00"
+        best_time_minutes = hour_stats[best_hour] if hour_stats else 0
+        
+        # Melhor dia
+        day_names = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 
+                     'Sexta-feira', 'Sábado', 'Domingo']
+        best_day_index = max(day_stats.keys(), key=lambda x: day_stats[x]) if day_stats else 0
+        best_day = day_names[best_day_index]
+        best_day_minutes = day_stats[best_day_index] if day_stats else 0
+        
+        # Duração média
+        avg_duration = sum(durations) // len(durations) if durations else 25
+        
+        # Taxa de conclusão (assumindo 25 min como meta)
+        completion_rate = int((avg_duration / 25) * 100) if avg_duration else 0
+        
+        conn.close()
+        
+        return {
+            'bestTime': best_time,
+            'bestTimeMinutes': best_time_minutes,
+            'bestDay': best_day,
+            'bestDayMinutes': best_day_minutes,
+            'avgDuration': avg_duration,
+            'completionRate': min(completion_rate, 100)
+        }
+    
+    def get_subject_ranking(self):
+        """Retorna ranking de disciplinas"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                s.id,
+                s.name,
+                s.weekly_hours,
+                s.current_week_minutes,
+                COUNT(ss.id) as sessions
+            FROM subjects s
+            LEFT JOIN study_sessions ss ON s.id = ss.subject_id
+            GROUP BY s.id
+            ORDER BY s.current_week_minutes DESC
+        ''')
+        
+        subjects = cursor.fetchall()
+        conn.close()
+        
+        ranking = []
+        for subject in subjects:
+            ranking.append({
+                'id': subject[0],
+                'name': subject[1],
+                'weeklyHours': subject[2],
+                'currentMinutes': subject[3],
+                'sessions': subject[4]
+            })
+        
+        return ranking
+    
+    def get_all_sessions(self):
+        """Retorna todas as sessões com informações da disciplina"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                ss.id,
+                ss.subject_id,
+                s.name as subject_name,
+                ss.minutes,
+                ss.started_at,
+                ss.completed_at
+            FROM study_sessions ss
+            JOIN subjects s ON ss.subject_id = s.id
+            ORDER BY ss.started_at DESC
+        ''')
+        
+        sessions = cursor.fetchall()
+        conn.close()
+        
+        result = []
+        for session in sessions:
+            result.append({
+                'id': session[0],
+                'subject_id': session[1],
+                'subject_name': session[2],
+                'minutes': session[3],
+                'started_at': session[4],
+                'completed_at': session[5]
+            })
+        
+        return result
+    
+    def get_all_subjects(self):
+        """Retorna todas as disciplinas"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id, name FROM subjects')
+        subjects = cursor.fetchall()
+        conn.close()
+        
+        return [{'id': s[0], 'name': s[1]} for s in subjects]

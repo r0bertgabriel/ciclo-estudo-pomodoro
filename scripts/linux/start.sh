@@ -60,8 +60,10 @@ echo "✅ Backend rodando em http://localhost:8000"
 
 # Iniciar frontend (HTTP Server)
 echo "🚀 Iniciando frontend na porta 8080..."
-python3 -m http.server 8080 > logs/frontend.log 2>&1 &
+cd frontend
+python3 -m http.server 8080 > ../logs/frontend.log 2>&1 &
 FRONTEND_PID=$!
+cd ..
 
 # Aguardar frontend inicializar
 sleep 1

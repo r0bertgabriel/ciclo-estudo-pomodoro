@@ -2,9 +2,7 @@
  * Gerenciamento de Storage com Backend API
  */
 
-import { DEFAULT_SETTINGS, STORAGE_KEYS } from './config.js';
-
-const API_BASE_URL = 'http://localhost:8000/api';
+import { API_BASE_URL, DEFAULT_SETTINGS, STORAGE_KEYS } from './config.js';
 
 export class StorageManager {
     /**
@@ -59,7 +57,7 @@ export class StorageManager {
      */
     static async getCycles() {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles`);
+            const response = await fetch(`${API_BASE_URL}/api/cycles`);
             if (!response.ok) throw new Error('Erro ao carregar ciclos');
             return await response.json();
         } catch (error) {
@@ -73,7 +71,7 @@ export class StorageManager {
      */
     static async getActiveCycle() {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles/active`);
+            const response = await fetch(`${API_BASE_URL}/api/cycles/active`);
             if (!response.ok) throw new Error('Erro ao carregar ciclo ativo');
             return await response.json();
         } catch (error) {
@@ -87,7 +85,7 @@ export class StorageManager {
      */
     static async createCycle(cycle) {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles`, {
+            const response = await fetch(`${API_BASE_URL}/api/cycles`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(cycle)
@@ -105,7 +103,7 @@ export class StorageManager {
      */
     static async updateCycle(cycleId, updates) {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles/${cycleId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/cycles/${cycleId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates)
@@ -123,7 +121,7 @@ export class StorageManager {
      */
     static async deleteCycle(cycleId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles/${cycleId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/cycles/${cycleId}`, {
                 method: 'DELETE'
             });
             if (!response.ok) throw new Error('Erro ao deletar ciclo');
@@ -139,7 +137,7 @@ export class StorageManager {
      */
     static async activateCycle(cycleId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/cycles/${cycleId}/activate`, {
+            const response = await fetch(`${API_BASE_URL}/api/cycles/${cycleId}/activate`, {
                 method: 'PUT'
             });
             if (!response.ok) throw new Error('Erro ao ativar ciclo');
@@ -155,7 +153,7 @@ export class StorageManager {
      */
     static async createSubject(subject) {
         try {
-            const response = await fetch(`${API_BASE_URL}/subjects`, {
+            const response = await fetch(`${API_BASE_URL}/api/subjects`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(subject)
@@ -173,7 +171,7 @@ export class StorageManager {
      */
     static async updateSubject(subjectId, updates) {
         try {
-            const response = await fetch(`${API_BASE_URL}/subjects/${subjectId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/subjects/${subjectId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates)
@@ -191,7 +189,7 @@ export class StorageManager {
      */
     static async deleteSubject(subjectId) {
         try {
-            const response = await fetch(`${API_BASE_URL}/subjects/${subjectId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/subjects/${subjectId}`, {
                 method: 'DELETE'
             });
             if (!response.ok) throw new Error('Erro ao deletar disciplina');
@@ -207,7 +205,7 @@ export class StorageManager {
      */
     static async createSession(session) {
         try {
-            const response = await fetch(`${API_BASE_URL}/sessions`, {
+            const response = await fetch(`${API_BASE_URL}/api/sessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(session)
@@ -225,7 +223,7 @@ export class StorageManager {
      */
     static async getStats(date) {
         try {
-            const response = await fetch(`${API_BASE_URL}/stats/${date}`);
+            const response = await fetch(`${API_BASE_URL}/api/stats/${date}`);
             if (!response.ok) throw new Error('Erro ao buscar estatísticas');
             return await response.json();
         } catch (error) {
@@ -239,7 +237,7 @@ export class StorageManager {
      */
     static async updateStats(date, stats) {
         try {
-            const response = await fetch(`${API_BASE_URL}/stats/${date}`, {
+            const response = await fetch(`${API_BASE_URL}/api/stats/${date}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(stats)

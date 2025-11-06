@@ -23,6 +23,12 @@
                 <span>Pomodoro Boladão</span>
             </h1>
             <div class="header-actions">
+                <a href="dashboard.html" class="header-btn" aria-label="Dashboard de Produtividade" title="Dashboard de Produtividade">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18M7 16l4-4 3 3 5-5"></path>
+                    </svg>
+                    <span class="header-btn-text">Dashboard</span>
+                </a>
                 <a href="ciclos.html" class="header-btn" aria-label="Gerenciar Ciclos de Estudo" title="Gerenciar Ciclos de Estudo">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
@@ -110,6 +116,9 @@
                 <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
+
+                <!-- Health Reminders Container -->
+                <div id="healthRemindersContainer" style="display: none;"></div>
             </section>
 
             <!-- Stats Section -->
@@ -157,6 +166,25 @@
             </header>
             
             <form class="modal-body" id="settingsForm">
+                <fieldset class="settings-group">
+                    <legend>Templates de Tempo</legend>
+                    
+                    <div class="setting-item">
+                        <label for="timeTemplate">Escolha um Template</label>
+                        <select id="timeTemplate" name="timeTemplate">
+                            <option value="default">Padrão (25-5-15)</option>
+                            <option value="intense">Intenso (40-10-20)</option>
+                            <option value="short">Curto (15-3-10)</option>
+                            <option value="long">Longo (50-10-30)</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="template-info" id="templateInfo">
+                        <small>💡 Selecione um template ou personalize seus próprios tempos abaixo</small>
+                    </div>
+                </fieldset>
+
                 <fieldset class="settings-group">
                     <legend>Tempos</legend>
                     

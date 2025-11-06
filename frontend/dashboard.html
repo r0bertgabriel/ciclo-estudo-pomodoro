@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de Produtividade - Pomodoro Boladão">
+    <title>Dashboard - Pomodoro Boladão</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="dashboardApp">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>
+                    <span class="emoji">📊</span>
+                    Dashboard de Produtividade
+                </h1>
+                <div class="header-actions">
+                    <a href="index.html" class="header-btn" title="Timer">
+                        ⏱️ <span class="header-btn-text">Timer</span>
+                    </a>
+                    <a href="ciclos.html" class="header-btn" title="Ciclos">
+                        🔄 <span class="header-btn-text">Ciclos</span>
+                    </a>
+                    <button class="header-btn" id="exportBtn" title="Exportar Dados">
+                        📤 <span class="header-btn-text">Exportar</span>
+                    </button>
+                    <button class="header-btn" id="backupBtn" title="Backup">
+                        💾 <span class="header-btn-text">Backup</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            
+            <!-- Filtros -->
+            <section class="dashboard-filters">
+                <div class="filter-group">
+                    <label for="periodFilter">Período:</label>
+                    <select id="periodFilter" class="filter-select">
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mês</option>
+                        <option value="all">Todo Período</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="subjectFilter">Disciplina:</label>
+                    <select id="subjectFilter" class="filter-select">
+                        <option value="all">Todas as Disciplinas</option>
+                    </select>
+                </div>
+                <button class="btn-refresh" id="refreshBtn">🔄 Atualizar</button>
+            </section>
+
+            <!-- Cards de Resumo -->
+            <section class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalHours">0h</div>
+                        <div class="stat-label">Tempo Total de Estudo</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🍅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalSessions">0</div>
+                        <div class="stat-label">Sessões Completadas</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalSubjects">0</div>
+                        <div class="stat-label">Disciplinas Estudadas</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Dias Consecutivos</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráfico de Evolução -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>📈 Evolução de Estudos</h2>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-chart="daily">Diário</button>
+                        <button class="chart-btn" data-chart="weekly">Semanal</button>
+                        <button class="chart-btn" data-chart="monthly">Mensal</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Gráfico por Disciplina -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>📚 Distribuição por Disciplina</h2>
+                </div>
+                <div class="chart-container-row">
+                    <div class="chart-container-half">
+                        <canvas id="subjectPieChart"></canvas>
+                    </div>
+                    <div class="chart-container-half">
+                        <canvas id="subjectBarChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Heatmap de Atividade -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🔥 Heatmap de Atividade</h2>
+                    <p class="section-subtitle">Visualize seus horários mais produtivos</p>
+                </div>
+                <div class="heatmap-container" id="heatmapContainer">
+                    <div class="heatmap-loading">Carregando dados...</div>
+                </div>
+            </section>
+
+            <!-- Análise de Padrões -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🧠 Análise de Padrões</h2>
+                    <p class="section-subtitle">Insights sobre seu comportamento de estudo</p>
+                </div>
+                <div class="patterns-grid">
+                    <div class="pattern-card">
+                        <div class="pattern-icon">🌅</div>
+                        <h3>Melhor Horário</h3>
+                        <div class="pattern-value" id="bestTimeOfDay">--:--</div>
+                        <p class="pattern-description" id="bestTimeDesc">Calculando...</p>
+                    </div>
+                    <div class="pattern-card">
+                        <div class="pattern-icon">📅</div>
+                        <h3>Melhor Dia da Semana</h3>
+                        <div class="pattern-value" id="bestDayOfWeek">---</div>
+                        <p class="pattern-description" id="bestDayDesc">Calculando...</p>
+                    </div>
+                    <div class="pattern-card">
+                        <div class="pattern-icon">⏱️</div>
+                        <h3>Duração Média</h3>
+                        <div class="pattern-value" id="avgSessionDuration">0 min</div>
+                        <p class="pattern-description">Por sessão de foco</p>
+                    </div>
+                    <div class="pattern-card">
+                        <div class="pattern-icon">🎯</div>
+                        <h3>Taxa de Conclusão</h3>
+                        <div class="pattern-value" id="completionRate">0%</div>
+                        <p class="pattern-description">Sessões completadas</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ranking de Disciplinas -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🏆 Ranking de Disciplinas</h2>
+                </div>
+                <div class="ranking-container" id="rankingContainer">
+                    <div class="ranking-loading">Carregando...</div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal de Exportação -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📤 Exportar Dados</h2>
+                <button class="modal-close" id="closeExportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Escolha o formato de exportação:</p>
+                <div class="export-options">
+                    <button class="export-btn" id="exportCsvBtn">
+                        <span class="export-icon">📄</span>
+                        <span>Exportar CSV</span>
+                        <small>Dados em formato de planilha</small>
+                    </button>
+                    <button class="export-btn" id="exportJsonBtn">
+                        <span class="export-icon">📋</span>
+                        <span>Exportar JSON</span>
+                        <small>Dados em formato estruturado</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Backup -->
+    <div class="modal" id="backupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💾 Backup do Banco de Dados</h2>
+                <button class="modal-close" id="closeBackupModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="backup-section">
+                    <h3>Fazer Backup</h3>
+                    <p>Salve uma cópia do seu banco de dados localmente</p>
+                    <button class="btn-primary" id="createBackupBtn">💾 Criar Backup</button>
+                </div>
+                <div class="backup-section">
+                    <h3>Restaurar Backup</h3>
+                    <p>Restaure seus dados de um backup anterior</p>
+                    <input type="file" id="restoreBackupInput" accept=".db,.sqlite,.sqlite3" style="display: none;">
+                    <button class="btn-secondary" id="restoreBackupBtn">📂 Restaurar do Arquivo</button>
+                </div>
+                <div class="backup-info">
+                    <small>⚠️ Atenção: Restaurar um backup substituirá todos os dados atuais.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

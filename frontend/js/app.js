@@ -4,6 +4,7 @@
  */
 
 import { TIMER_MODES } from './config.js';
+import { HealthReminders } from './health-reminders.js';
 import { NotificationManager } from './notifications.js';
 import { StorageManager } from './storage.js';
 import { StudyCycle } from './study-cycle.js';
@@ -19,6 +20,7 @@ class PomodoroApp {
             this.storage = StorageManager;
             this.notifications = new NotificationManager();
             this.studyCycle = new StudyCycle();
+            this.healthReminders = new HealthReminders();
             
             // Estado da aplicação
             this.settings = this.storage.loadSettings();
@@ -171,6 +173,14 @@ class PomodoroApp {
             this.saveSettings();
         });
 
+        // Template de tempo
+        const templateSelect = document.getElementById('timeTemplate');
+        if (templateSelect) {
+            templateSelect.addEventListener('change', (e) => {
+                this.applyTimeTemplate(e.target.value);
+            });
+        }
+
         // Resetar estatísticas
         this.ui.elements.resetStats.addEventListener('click', () => {
             this.resetStats();
@@ -280,12 +290,21 @@ class PomodoroApp {
         }
         
         this.timer.setMode(mode);
+        
+        // Mostrar ou esconder lembretes de saúde baseado no modo
+        if (mode === TIMER_MODES.SHORT_BREAK) {
+            this.healthReminders.showHealthReminders('short');
+        } else if (mode === TIMER_MODES.LONG_BREAK) {
+            this.healthReminders.showHealthReminders('long');
+        } else {
+            this.healthReminders.hideHealthReminders();
+        }
     }
 
     /**
      * Trata conclusão do timer
      */
-    handleTimerCompletion(data) {
+    async handleTimerCompletion(data) {
         // Animação de conclusão
         this.ui.activateCompletionAnimation();
         
@@ -309,9 +328,9 @@ class PomodoroApp {
             this.storage.saveStats(this.stats);
             this.ui.updateStats(this.stats);
             
-            // Registrar sessão no ciclo de estudos
+            // Registrar sessão no ciclo de estudos (agora assíncrono)
             if (this.selectedSubjectId) {
-                const success = this.studyCycle.recordSession(
+                const success = await this.studyCycle.recordSession(
                     this.selectedSubjectId, 
                     this.settings.focusTime
                 );
@@ -450,6 +469,40 @@ class PomodoroApp {
         this.updateSessionDisplay();
         
         this.ui.closeSettings();
+    }
+
+    /**
+     * Aplica template de tempo
+     */
+    async applyTimeTemplate(templateName) {
+        const { TIME_TEMPLATES } = await import('./config.js');
+        const template = TIME_TEMPLATES[templateName];
+        
+        if (template && templateName !== 'custom') {
+            // Atualizar os inputs com os valores do template
+            document.getElementById('focusTime').value = template.focusTime;
+            document.getElementById('focusValue').textContent = template.focusTime;
+            
+            document.getElementById('shortBreakTime').value = template.shortBreakTime;
+            document.getElementById('shortBreakValue').textContent = template.shortBreakTime;
+            
+            document.getElementById('longBreakTime').value = template.longBreakTime;
+            document.getElementById('longBreakValue').textContent = template.longBreakTime;
+            
+            document.getElementById('sessionsBeforeLongBreak').value = template.sessionsBeforeLongBreak;
+            document.getElementById('sessionsValue').textContent = template.sessionsBeforeLongBreak;
+            
+            // Atualizar info do template
+            const templateInfo = document.getElementById('templateInfo');
+            if (templateInfo) {
+                templateInfo.innerHTML = `<small>✅ Template "${template.name}" aplicado</small>`;
+            }
+        } else if (templateName === 'custom') {
+            const templateInfo = document.getElementById('templateInfo');
+            if (templateInfo) {
+                templateInfo.innerHTML = `<small>⚙️ Personalize os tempos abaixo conforme sua necessidade</small>`;
+            }
+        }
     }
 
     /**

@@ -68,12 +68,15 @@ class PomodoroLauncher:
         print(f"🚀 Iniciando frontend na porta {FRONTEND_PORT}...")
         log_file = self.project_dir / "logs" / "frontend.log"
         
+        # Executar http.server de dentro da pasta frontend
+        frontend_dir = self.project_dir / "frontend"
+        
         with open(log_file, "w") as f:
             self.frontend_process = subprocess.Popen(
                 FRONTEND_CMD,
                 stdout=f,
                 stderr=subprocess.STDOUT,
-                cwd=self.project_dir
+                cwd=frontend_dir  # ✅ Mudado de project_dir para frontend_dir
             )
         time.sleep(2)
         print("✅ Frontend iniciado!")
@@ -81,7 +84,9 @@ class PomodoroLauncher:
     def open_browser(self):
         """Abre o navegador"""
         print("🌐 Abrindo navegador...")
-        webbrowser.open(f"http://localhost:{FRONTEND_PORT}/index.html")
+        # Como http.server agora roda de dentro de /frontend/, 
+        # index.html está na raiz do servidor
+        webbrowser.open(f"http://localhost:{FRONTEND_PORT}/")
     
     def stop(self):
         """Para os processos"""
@@ -175,7 +180,8 @@ class PomodoroLauncher:
         browser_btn.grid(row=1, column=0, columnspan=2, pady=10)
         
         # Info
-        info = tk.Label(root, text=f"Timer: localhost:{FRONTEND_PORT}/index.html\n"
+        info = tk.Label(root, text=f"Timer: localhost:{FRONTEND_PORT}/\n"
+                                  f"Ciclos: localhost:{FRONTEND_PORT}/ciclos.html\n"
                                   f"API: localhost:{BACKEND_PORT}/docs",
                        font=("Arial", 9), fg="gray")
         info.pack(pady=10)
@@ -206,7 +212,9 @@ class PomodoroLauncher:
             print("\n" + "="*50)
             print("✅ APLICAÇÃO RODANDO!")
             print("="*50)
-            print(f"\n📱 Timer:  http://localhost:{FRONTEND_PORT}/index.html")
+            print(f"\n📱 Timer:  http://localhost:{FRONTEND_PORT}/")
+            print(f"📚 Ciclos: http://localhost:{FRONTEND_PORT}/ciclos.html")
+            print(f"📊 Dashboard: http://localhost:{FRONTEND_PORT}/dashboard.html")
             print(f"🔧 API:    http://localhost:{BACKEND_PORT}/docs")
             print("\n💡 Pressione Ctrl+C para parar\n")
             

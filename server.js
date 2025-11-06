@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const PORT = 8000;
+const PORT = 8080;  // Mudado de 8000 para 8080 (evitar conflito com backend)
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',

@@ -282,21 +282,39 @@ export class StudyCycle {
     }
 
     /**
-     * Registra uma sessão de estudo
+     * Registra uma sessão de estudo (localStorage + backend)
      */
-    recordSession(subjectId, minutes) {
+    async recordSession(subjectId, minutes) {
         const cycle = this.getActiveCycle();
         if (!cycle) return false;
 
         const subject = cycle.subjects.find(s => s.id === subjectId);
         if (!subject) return false;
 
+        // Atualizar localStorage
         subject.currentWeekMinutes += minutes;
         subject.totalMinutes += minutes;
         subject.totalSessions++;
         subject.lastStudied = new Date().toISOString();
 
-        this.saveCycles();
+        await this.saveCycles();
+        
+        // Salvar no backend
+        try {
+            const now = new Date();
+            const session = {
+                subject_id: subjectId,
+                minutes: minutes,
+                started_at: new Date(now.getTime() - minutes * 60000).toISOString(),
+                completed_at: now.toISOString()
+            };
+            
+            await StorageManager.createSession(session);
+            console.log('✅ Sessão salva no backend:', session);
+        } catch (error) {
+            console.warn('⚠️ Erro ao salvar sessão no backend:', error);
+        }
+        
         return true;
     }
 

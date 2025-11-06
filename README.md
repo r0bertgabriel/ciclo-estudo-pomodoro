@@ -396,6 +396,20 @@ MIT License - Sinta-se livre para usar e modificar!
 
 ---
 
+## 🔧 Problemas Comuns?
+
+Se você encontrar erros ao iniciar o servidor, consulte nosso [**Guia de Troubleshooting**](docs/TROUBLESHOOTING.md).
+
+**Erro comum:** `Could not import module "main"`
+- **Solução:** Execute o uvicorn do diretório `backend/` ou use `python3 -m uvicorn backend.main:app --reload --port 8000`
+
+**Documentação adicional:**
+- 📊 [Novas Funcionalidades](docs/NOVAS-FUNCIONALIDADES.md) - Dashboard, Analytics, Backup, etc.
+- 🔧 [Troubleshooting](docs/TROUBLESHOOTING.md) - Resolvendo erros comuns
+- 📖 [Documentação da API](docs/API.md) - Endpoints disponíveis
+
+---
+
 ## 🤝 Contribuindo
 
 1. Fork o projeto

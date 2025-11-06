@@ -10,14 +10,47 @@ export const DEFAULT_SETTINGS = {
     autoStartBreaks: true,
     autoStartPomodoros: false,
     notifications: true,
-    alarmSound: 'bell'
+    alarmSound: 'bell',
+    currentTemplate: 'default'
+};
+
+export const TIME_TEMPLATES = {
+    default: {
+        name: 'Padrão (25-5-15)',
+        focusTime: 25,
+        shortBreakTime: 5,
+        longBreakTime: 15,
+        sessionsBeforeLongBreak: 4
+    },
+    intense: {
+        name: 'Intenso (40-10-20)',
+        focusTime: 40,
+        shortBreakTime: 10,
+        longBreakTime: 20,
+        sessionsBeforeLongBreak: 4
+    },
+    short: {
+        name: 'Curto (15-3-10)',
+        focusTime: 15,
+        shortBreakTime: 3,
+        longBreakTime: 10,
+        sessionsBeforeLongBreak: 3
+    },
+    long: {
+        name: 'Longo (50-10-30)',
+        focusTime: 50,
+        shortBreakTime: 10,
+        longBreakTime: 30,
+        sessionsBeforeLongBreak: 3
+    }
 };
 
 export const STORAGE_KEYS = {
     SETTINGS: 'pomodoro_settings',
     STATS: 'pomodoro_stats',
     STUDY_CYCLE: 'pomodoro_study_cycle',
-    CYCLE_PROGRESS: 'pomodoro_cycle_progress'
+    CYCLE_PROGRESS: 'pomodoro_cycle_progress',
+    CUSTOM_TEMPLATES: 'pomodoro_custom_templates'
 };
 
 export const TIMER_MODES = {
@@ -131,3 +164,6 @@ export const SOUND_FREQUENCIES = {
     chime: [523, 659, 784],
     digital: [1000, 1000, 1000]
 };
+
+// API Configuration
+export const API_BASE_URL = 'http://localhost:8000';
