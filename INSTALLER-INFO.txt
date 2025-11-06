@@ -1,0 +1,94 @@
+═══════════════════════════════════════════════════════════════════
+        🍅 BEM-VINDO AO POMODORO BOLADÃO 🍅
+═══════════════════════════════════════════════════════════════════
+
+📋 SOBRE O PROJETO
+───────────────────────────────────────────────────────────────────
+
+O Pomodoro Boladão é um sistema completo de gerenciamento de tempo
+baseado na Técnica Pomodoro, desenvolvido para ajudar estudantes e
+profissionais a organizarem melhor seu tempo de estudo e trabalho.
+
+🎯 FUNCIONALIDADES PRINCIPAIS:
+
+  ✓ Timer Pomodoro customizável (25 min de foco)
+  ✓ Pausas curtas (5 min) e longas (15 min)
+  ✓ Gerenciamento de ciclos de estudo semanais
+  ✓ Controle de disciplinas e horas por matéria
+  ✓ Persistência de dados em banco SQLite
+  ✓ Interface intuitiva e notificações
+  ✓ Backend REST API com FastAPI
+  ✓ Sistema de bloqueio semanal automático
+
+🔧 TECNOLOGIAS UTILIZADAS:
+
+  • Python 3.8+
+  • FastAPI (Backend REST API)
+  • SQLite (Banco de Dados)
+  • JavaScript ES6+ (Frontend)
+  • Tkinter (Interface de Launcher)
+
+👨‍💻 DESENVOLVIDO POR:
+
+  Robert Gabriel
+  GitHub: https://github.com/r0bertgabriel
+  Repositório: https://github.com/r0bertgabriel/ciclo-estudo-pomodoro
+
+📦 REQUISITOS DO SISTEMA:
+
+  • Windows 10 ou Windows 11 (64-bit)
+  • Python 3.8 ou superior
+  • Mínimo 100 MB de espaço em disco
+  • 2 GB de RAM (recomendado)
+
+⚙️ O QUE SERÁ INSTALADO:
+
+  1. Verificação da instalação do Python
+  2. Instalação automática das dependências:
+     - FastAPI (framework web)
+     - Uvicorn (servidor ASGI)
+     - SQLite (já incluso no Python)
+  3. Arquivos do aplicativo Pomodoro Boladão
+  4. Atalhos para fácil acesso
+
+🚀 APÓS A INSTALAÇÃO:
+
+  O aplicativo estará disponível no Menu Iniciar e na Área de Trabalho
+  (se você escolheu criar o ícone).
+
+  Ao executar pela primeira vez:
+    1. O launcher abrirá automaticamente
+    2. Clique em "▶ Iniciar Pomodoro"
+    3. O navegador abrirá com a interface
+    4. Configure suas disciplinas e comece!
+
+📚 DOCUMENTAÇÃO:
+
+  Após a instalação, você encontrará diversos arquivos de ajuda:
+    • README.md - Guia completo
+    • INICIO-RAPIDO.md - Início rápido
+    • QUICK-START.md - Quick start guide
+    • INSTRUCOES-WINDOWS.txt - Instruções Windows
+
+💡 DICAS:
+
+  • Use o launcher para iniciar facilmente
+  • O backend roda na porta 8000
+  • O frontend roda na porta 8080
+  • Dados salvos em: backend/pomodoro.db
+
+🐛 SUPORTE:
+
+  Encontrou algum problema? Abra uma issue no GitHub:
+  https://github.com/r0bertgabriel/ciclo-estudo-pomodoro/issues
+
+📄 LICENÇA:
+
+  Este projeto é open source e está disponível sob licença MIT.
+  Você é livre para usar, modificar e distribuir.
+
+═══════════════════════════════════════════════════════════════════
+
+Clique em "Avançar" para continuar com a instalação.
+
+═══════════════════════════════════════════════════════════════════
