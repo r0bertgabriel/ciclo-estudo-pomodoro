@@ -1,12 +1,18 @@
-127.0.0.1 - - [06/Nov/2025 20:10:29] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:10:32] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:10:39] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:11:03] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:12:31] code 404, message File not found
-127.0.0.1 - - [06/Nov/2025 20:12:31] "GET /%F0%9F%8D%85 HTTP/1.1" 404 -
-127.0.0.1 - - [06/Nov/2025 20:13:33] code 404, message File not found
-127.0.0.1 - - [06/Nov/2025 20:13:33] "GET /%F0%9F%8D%85 HTTP/1.1" 404 -
-127.0.0.1 - - [06/Nov/2025 20:13:41] "GET /dashboard.html HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:13:41] "GET /dashboard.css HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:13:41] "GET /js/dashboard.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:13:44] "GET /sw.js HTTP/1.1" 304 -
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File 127.0.0.1 - - [06/Nov/2025 20:47:11] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [06/Nov/2025 20:50:35] "GET / HTTP/1.1" 200 -
+ython3.12/http/server.py", line 1261, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/br4b0/miniconda3/lib/python3.12/socketserver.py", line 457, in __init__
+    self.server_bind()
+  File "/home/br4b0/miniconda3/lib/python3.12/http/server.py", line 1308, in server_bind
+    return super().server_bind()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/br4b0/miniconda3/lib/python3.12/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/home/br4b0/miniconda3/lib/python3.12/socketserver.py", line 473, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use

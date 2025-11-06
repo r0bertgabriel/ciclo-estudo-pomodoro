@@ -82,12 +82,25 @@ export class StorageManager {
      */
     static async getActiveCycle() {
         try {
+            // Verifica se backend está disponível
+            const backendAvailable = await checkBackendAvailability();
+            
+            if (!backendAvailable) {
+                // Fallback para localStorage
+                console.info('📦 Carregando ciclo ativo do localStorage (modo offline)');
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                return cycles.find(c => c.is_active) || null;
+            }
+            
             const response = await fetch(`${API_BASE_URL}/api/cycles/active`);
             if (!response.ok) throw new Error('Erro ao carregar ciclo ativo');
             return await response.json();
         } catch (error) {
             console.error('Erro ao buscar ciclo ativo:', error);
-            return null;
+            // Fallback para localStorage em caso de erro
+            console.info('📦 Fallback: carregando ciclo ativo do localStorage');
+            const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+            return cycles.find(c => c.is_active) || null;
         }
     }
 
@@ -96,16 +109,39 @@ export class StorageManager {
      */
     static async createCycle(cycle) {
         try {
+            // Verifica se backend está disponível
+            const backendAvailable = await checkBackendAvailability();
+            
+            if (!backendAvailable) {
+                // Fallback para localStorage
+                console.info('📦 Salvando ciclo no localStorage (modo offline)');
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                cycles.push(cycle);
+                this.save(STORAGE_KEYS.CYCLES, cycles);
+                return cycle;
+            }
+            
             const response = await fetch(`${API_BASE_URL}/api/cycles`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(cycle)
             });
             if (!response.ok) throw new Error('Erro ao criar ciclo');
+            
+            // Salvar também no localStorage como backup
+            const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+            cycles.push(cycle);
+            this.save(STORAGE_KEYS.CYCLES, cycles);
+            
             return await response.json();
         } catch (error) {
             console.error('Erro ao criar ciclo:', error);
-            return null;
+            // Fallback para localStorage em caso de erro
+            console.info('📦 Fallback: salvando ciclo no localStorage');
+            const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+            cycles.push(cycle);
+            this.save(STORAGE_KEYS.CYCLES, cycles);
+            return cycle;
         }
     }
 
@@ -164,6 +200,23 @@ export class StorageManager {
      */
     static async createSubject(subject) {
         try {
+            // Verifica se backend está disponível
+            const backendAvailable = await checkBackendAvailability();
+            
+            if (!backendAvailable) {
+                // Fallback para localStorage
+                console.info('📦 Salvando disciplina no localStorage (modo offline)');
+                // Disciplinas são armazenadas dentro dos ciclos
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                const cycle = cycles.find(c => c.id === subject.cycle_id);
+                if (cycle) {
+                    if (!cycle.subjects) cycle.subjects = [];
+                    cycle.subjects.push(subject);
+                    this.save(STORAGE_KEYS.CYCLES, cycles);
+                }
+                return subject;
+            }
+            
             const response = await fetch(`${API_BASE_URL}/api/subjects`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -173,7 +226,16 @@ export class StorageManager {
             return await response.json();
         } catch (error) {
             console.error('Erro ao criar disciplina:', error);
-            return null;
+            // Fallback para localStorage em caso de erro
+            console.info('📦 Fallback: salvando disciplina no localStorage');
+            const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+            const cycle = cycles.find(c => c.id === subject.cycle_id);
+            if (cycle) {
+                if (!cycle.subjects) cycle.subjects = [];
+                cycle.subjects.push(subject);
+                this.save(STORAGE_KEYS.CYCLES, cycles);
+            }
+            return subject;
         }
     }
 
