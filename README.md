@@ -5,9 +5,9 @@
 ## 🖼️ Galeria Pomodoro
 
 <div align="center">
-   <img src="public/foco.png" alt="Foco Pomodoro" width="220"/>
-   <img src="public/curta.png" alt="Pausa Curta" width="220"/>
-   <img src="public/longa.png" alt="Pausa Longa" width="220"/>
+   <img src="frontend/public/foco.png" alt="Foco Pomodoro" width="220"/>
+   <img src="frontend/public/curta.png" alt="Pausa Curta" width="220"/>
+   <img src="frontend/public/longa.png" alt="Pausa Longa" width="220"/>
 </div>
 
 Sistema completo de Pomodoro Timer integrado com gerenciamento de ciclos de estudos, controle semanal de horas por disciplina e persistência em banco de dados SQLite.
@@ -32,7 +32,7 @@ git clone https://github.com/r0bertgabriel/ciclo-estudo-pomodoro.git
 cd ciclo-estudo-pomodoro
 
 # Executar script de inicialização (inicia backend + frontend juntos)
-./start-all.sh
+./scripts/linux/start-all.sh
 ```
 
 ### 🪟 Windows
@@ -43,7 +43,7 @@ git clone https://github.com/r0bertgabriel/ciclo-estudo-pomodoro.git
 cd ciclo-estudo-pomodoro
 
 REM Executar script de inicialização (inicia backend + frontend juntos)
-start.bat
+scripts\windows\start.bat
 ```
 
 **Pronto! 🎉** A aplicação abrirá automaticamente no navegador em `http://localhost:8080`
@@ -415,7 +415,7 @@ MIT License - Sinta-se livre para usar e modificar!
 
 ## 🎓 Créditos
 
-Desenvolvido com 🍅 para estudantes que querem organizar seus estudos de forma eficiente!
+Desenvolvido para estudantes que querem organizar seus estudos de forma eficiente!
 
 **Técnica Pomodoro:** Francesco Cirillo  
 **Aplicação:** r0bertgabriel

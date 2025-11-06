@@ -35,8 +35,8 @@ const server = createServer(async (req, res) => {
             filePath = '/index.html';
         }
         
-        // Caminho completo do arquivo
-        const fullPath = join(__dirname, filePath);
+        // Caminho completo do arquivo (servindo da pasta frontend)
+        const fullPath = join(__dirname, 'frontend', filePath);
         
         // Ler arquivo
         const content = await readFile(fullPath);
