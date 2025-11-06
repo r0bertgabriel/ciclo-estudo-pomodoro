@@ -57,12 +57,23 @@ export class StorageManager {
      */
     static async getCycles() {
         try {
+            // Verifica se backend está disponível
+            const backendAvailable = await checkBackendAvailability();
+            
+            if (!backendAvailable) {
+                // Fallback para localStorage
+                console.info('📦 Carregando ciclos do localStorage (modo offline)');
+                return this.load(STORAGE_KEYS.CYCLES) || [];
+            }
+            
             const response = await fetch(`${API_BASE_URL}/api/cycles`);
             if (!response.ok) throw new Error('Erro ao carregar ciclos');
             return await response.json();
         } catch (error) {
             console.error('Erro ao buscar ciclos:', error);
-            return [];
+            // Fallback para localStorage em caso de erro
+            console.info('📦 Fallback: carregando ciclos do localStorage');
+            return this.load(STORAGE_KEYS.CYCLES) || [];
         }
     }
 

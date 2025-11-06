@@ -40,9 +40,11 @@ start "Backend - Pomodoro API" cmd /k "python -m uvicorn backend.main:app --relo
 REM Aguardar backend inicializar
 timeout /t 3 /nobreak >nul
 
-REM Iniciar frontend (HTTP Server)
+REM Iniciar frontend (HTTP Server) - CORRIGIDO para rodar de dentro de /frontend/
 echo 🚀 Iniciando frontend na porta 8080...
+cd frontend
 start "Frontend - Pomodoro App" cmd /k "python -m http.server 8080"
+cd ..
 
 REM Aguardar frontend inicializar
 timeout /t 2 /nobreak >nul

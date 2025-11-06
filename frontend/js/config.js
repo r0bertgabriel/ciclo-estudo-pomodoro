@@ -166,4 +166,51 @@ export const SOUND_FREQUENCIES = {
 };
 
 // API Configuration
-export const API_BASE_URL = 'http://localhost:8000';
+// Detecta automaticamente se está rodando localmente ou em produção
+export const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8000'
+    : `${window.location.protocol}//${window.location.hostname}:8000`;
+
+// Flag para verificar se backend está disponível
+let backendAvailable = null;
+
+/**
+ * Verifica se o backend está disponível
+ * @returns {Promise<boolean>}
+ */
+export async function checkBackendAvailability() {
+    if (backendAvailable !== null) {
+        return backendAvailable;
+    }
+    
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+        
+        const response = await fetch(`${API_BASE_URL}/api/health`, {
+            method: 'GET',
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        backendAvailable = response.ok;
+        
+        if (!backendAvailable) {
+            console.warn('⚠️ Backend não está respondendo. Usando modo offline (localStorage).');
+        }
+        
+        return backendAvailable;
+    } catch (error) {
+        console.warn('⚠️ Backend não disponível:', error.message);
+        console.info('ℹ️ Aplicação funcionando em modo offline (localStorage).');
+        backendAvailable = false;
+        return false;
+    }
+}
+
+/**
+ * Reseta o cache de disponibilidade do backend
+ */
+export function resetBackendAvailability() {
+    backendAvailable = null;
+}

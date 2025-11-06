@@ -77,6 +77,16 @@ class StatsUpdate(BaseModel):
 async def root():
     return {"message": "Pomodoro API is running"}
 
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint para verificar se o backend está disponível"""
+    return {
+        "status": "healthy",
+        "service": "Pomodoro API",
+        "version": "1.0.0",
+        "timestamp": datetime.now().isoformat()
+    }
+
 @app.post("/api/cycles")
 async def create_cycle(cycle: CycleCreate):
     """Cria um novo ciclo"""
