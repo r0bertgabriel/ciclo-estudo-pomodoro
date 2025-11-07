@@ -172,45 +172,33 @@ export const API_BASE_URL = window.location.hostname === 'localhost' || window.l
     : `${window.location.protocol}//${window.location.hostname}:8000`;
 
 // Flag para verificar se backend está disponível
-let backendAvailable = null;
-
 /**
  * Verifica se o backend está disponível
  * @returns {Promise<boolean>}
  */
 export async function checkBackendAvailability() {
-    if (backendAvailable !== null) {
-        return backendAvailable;
-    }
-    
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
         
         const response = await fetch(`${API_BASE_URL}/api/health`, {
             method: 'GET',
-            signal: controller.signal
+            signal: controller.signal,
+            cache: 'no-cache'
         });
         
         clearTimeout(timeoutId);
-        backendAvailable = response.ok;
         
-        if (!backendAvailable) {
-            console.warn('⚠️ Backend não está respondendo. Usando modo offline (localStorage).');
+        if (response.ok) {
+            console.log('✅ Backend disponível');
+            return true;
+        } else {
+            console.warn('⚠️ Backend respondeu com erro. Usando modo offline.');
+            return false;
         }
-        
-        return backendAvailable;
     } catch (error) {
         console.warn('⚠️ Backend não disponível:', error.message);
         console.info('ℹ️ Aplicação funcionando em modo offline (localStorage).');
-        backendAvailable = false;
         return false;
     }
-}
-
-/**
- * Reseta o cache de disponibilidade do backend
- */
-export function resetBackendAvailability() {
-    backendAvailable = null;
 }

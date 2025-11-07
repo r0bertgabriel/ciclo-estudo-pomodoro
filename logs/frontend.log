@@ -3,8 +3,8 @@ Traceback (most recent call last):
   File "<frozen runpy>", line 88, in _run_code
   File 127.0.0.1 - - [06/Nov/2025 20:47:11] "GET /sw.js HTTP/1.1" 304 -
 127.0.0.1 - - [06/Nov/2025 20:50:35] "GET / HTTP/1.1" 200 -
-ython3.12/http/server.py", line 1261, in test
-    with ServerClass(addr, HandlerClass) as httpd:
+127.0.0.1 - - [06/Nov/2025 20:57:47] "HEAD / HTTP/1.1" 200 -
+Class(addr, HandlerClass) as httpd:
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/br4b0/miniconda3/lib/python3.12/socketserver.py", line 457, in __init__
     self.server_bind()

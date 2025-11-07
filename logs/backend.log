@@ -5,3 +5,7 @@ ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000)
 INFO:     Waiting INFO:     127.0.0.1:56928 - "GET /api/cycles HTTP/1.1" 200 OK
 INFO:     127.0.0.1:39960 - "GET /api/health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:36892 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44042 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46638 - "POST /api/cycles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44962 - "POST /api/cycles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44708 - "GET /api/cycles HTTP/1.1" 200 OK

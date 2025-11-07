@@ -67,12 +67,14 @@ export class StorageManager {
             }
             
             const response = await fetch(`${API_BASE_URL}/api/cycles`);
-            if (!response.ok) throw new Error('Erro ao carregar ciclos');
+            if (!response.ok) {
+                console.warn(`⚠️ Backend retornou ${response.status}. Usando localStorage.`);
+                return this.load(STORAGE_KEYS.CYCLES) || [];
+            }
             return await response.json();
         } catch (error) {
-            console.error('Erro ao buscar ciclos:', error);
-            // Fallback para localStorage em caso de erro
-            console.info('📦 Fallback: carregando ciclos do localStorage');
+            // Fallback para localStorage em caso de erro (não é erro crítico)
+            console.info('📦 Usando dados locais (backend indisponível)');
             return this.load(STORAGE_KEYS.CYCLES) || [];
         }
     }
@@ -93,12 +95,15 @@ export class StorageManager {
             }
             
             const response = await fetch(`${API_BASE_URL}/api/cycles/active`);
-            if (!response.ok) throw new Error('Erro ao carregar ciclo ativo');
+            if (!response.ok) {
+                console.warn(`⚠️ Backend retornou ${response.status}. Usando localStorage.`);
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                return cycles.find(c => c.is_active) || null;
+            }
             return await response.json();
         } catch (error) {
-            console.error('Erro ao buscar ciclo ativo:', error);
             // Fallback para localStorage em caso de erro
-            console.info('📦 Fallback: carregando ciclo ativo do localStorage');
+            console.info('📦 Usando dados locais (backend indisponível)');
             const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
             return cycles.find(c => c.is_active) || null;
         }
@@ -126,18 +131,25 @@ export class StorageManager {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(cycle)
             });
-            if (!response.ok) throw new Error('Erro ao criar ciclo');
+            
+            if (!response.ok) {
+                console.warn(`⚠️ Backend retornou ${response.status}. Salvando localmente.`);
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                cycles.push(cycle);
+                this.save(STORAGE_KEYS.CYCLES, cycles);
+                return cycle;
+            }
             
             // Salvar também no localStorage como backup
             const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
             cycles.push(cycle);
             this.save(STORAGE_KEYS.CYCLES, cycles);
             
+            console.log('✅ Ciclo salvo com sucesso (backend + localStorage)');
             return await response.json();
         } catch (error) {
-            console.error('Erro ao criar ciclo:', error);
-            // Fallback para localStorage em caso de erro
-            console.info('📦 Fallback: salvando ciclo no localStorage');
+            // Fallback para localStorage em caso de erro (não é erro crítico)
+            console.info('📦 Salvando ciclo localmente (backend indisponível)');
             const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
             cycles.push(cycle);
             this.save(STORAGE_KEYS.CYCLES, cycles);
@@ -206,7 +218,6 @@ export class StorageManager {
             if (!backendAvailable) {
                 // Fallback para localStorage
                 console.info('📦 Salvando disciplina no localStorage (modo offline)');
-                // Disciplinas são armazenadas dentro dos ciclos
                 const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
                 const cycle = cycles.find(c => c.id === subject.cycle_id);
                 if (cycle) {
@@ -222,12 +233,24 @@ export class StorageManager {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(subject)
             });
-            if (!response.ok) throw new Error('Erro ao criar disciplina');
+            
+            if (!response.ok) {
+                console.warn(`⚠️ Backend retornou ${response.status}. Salvando localmente.`);
+                const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
+                const cycle = cycles.find(c => c.id === subject.cycle_id);
+                if (cycle) {
+                    if (!cycle.subjects) cycle.subjects = [];
+                    cycle.subjects.push(subject);
+                    this.save(STORAGE_KEYS.CYCLES, cycles);
+                }
+                return subject;
+            }
+            
+            console.log('✅ Disciplina salva com sucesso');
             return await response.json();
         } catch (error) {
-            console.error('Erro ao criar disciplina:', error);
             // Fallback para localStorage em caso de erro
-            console.info('📦 Fallback: salvando disciplina no localStorage');
+            console.info('📦 Salvando disciplina localmente (backend indisponível)');
             const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
             const cycle = cycles.find(c => c.id === subject.cycle_id);
             if (cycle) {
