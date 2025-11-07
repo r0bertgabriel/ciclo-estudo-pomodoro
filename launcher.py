@@ -86,7 +86,18 @@ class PomodoroLauncher:
         print("🌐 Abrindo navegador...")
         # Como http.server agora roda de dentro de /frontend/, 
         # index.html está na raiz do servidor
-        webbrowser.open(f"http://localhost:{FRONTEND_PORT}/")
+        
+        # Suprimir erros do Fontconfig (comum no Linux)
+        import os
+        os.environ['FONTCONFIG_FILE'] = '/dev/null'
+        os.environ['FONTCONFIG_PATH'] = '/dev/null'
+        
+        try:
+            webbrowser.open(f"http://localhost:{FRONTEND_PORT}/")
+        except Exception:
+            print("⚠️ Não foi possível abrir o navegador automaticamente.")
+            print(f"   Por favor, abra manualmente: http://localhost:{FRONTEND_PORT}/")
+
     
     def stop(self):
         """Para os processos"""

@@ -98,12 +98,16 @@ echo "💡 Pressione Ctrl+C para parar a aplicação"
 echo ""
 
 # Abrir navegador automaticamente (se disponível)
+# Suprimir erros do Fontconfig
+export FONTCONFIG_FILE=/dev/null
+export FONTCONFIG_PATH=/dev/null
+
 if command -v xdg-open &> /dev/null; then
     sleep 2
-    xdg-open http://localhost:8080/index.html 2>/dev/null &
+    xdg-open http://localhost:8080/index.html >/dev/null 2>&1 &
 elif command -v open &> /dev/null; then
     sleep 2
-    open http://localhost:8080/index.html 2>/dev/null &
+    open http://localhost:8080/index.html >/dev/null 2>&1 &
 fi
 
 # Aguardar indefinidamente
