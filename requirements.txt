@@ -1,0 +1,16 @@
+# Dependências do Backend (FastAPI)
+fastapi==0.121.0
+uvicorn==0.38.0
+pydantic==2.12.3
+
+# Bibliotecas padrão do Python (já incluídas)
+# - json
+# - sqlite3
+# - datetime
+# - typing
+# - subprocess
+# - sys
+# - time
+# - webbrowser
+# - pathlib
+# - tkinter (incluído com Python, mas pode precisar de instalação separada no Linux)

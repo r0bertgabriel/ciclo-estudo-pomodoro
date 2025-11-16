@@ -481,8 +481,17 @@ export class StudyCycle {
                 is_active: cycle.id === this.activeCycleId
             };
             
-            // Tentar criar ou atualizar o ciclo
-            await StorageManager.createCycle(cycleData);
+            // Buscar ciclos existentes para verificar se já existe
+            const existingCycles = await StorageManager.getCycles();
+            const exists = existingCycles.some(c => c.id === cycle.id);
+            
+            if (exists) {
+                // Atualizar ciclo existente
+                await StorageManager.updateCycle(cycle.id, cycleData);
+            } else {
+                // Criar novo ciclo
+                await StorageManager.createCycle(cycleData);
+            }
             
             // Sincronizar disciplinas
             for (const subject of cycle.subjects) {
@@ -510,7 +519,18 @@ export class StudyCycle {
                 totalSessions: subject.totalSessions || 0
             };
             
-            await StorageManager.createSubject(subjectData);
+            // Buscar ciclos para verificar se a disciplina já existe
+            const existingCycles = await StorageManager.getCycles();
+            const existingCycle = existingCycles.find(c => c.id === cycleId);
+            const exists = existingCycle?.subjects?.some(s => s.id === subject.id);
+            
+            if (exists) {
+                // Atualizar disciplina existente
+                await StorageManager.updateSubject(subject.id, subjectData);
+            } else {
+                // Criar nova disciplina
+                await StorageManager.createSubject(subjectData);
+            }
         } catch (error) {
             console.warn('Erro ao sincronizar disciplina com backend:', error);
         }

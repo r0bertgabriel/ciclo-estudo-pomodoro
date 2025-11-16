@@ -140,12 +140,8 @@ export class StorageManager {
                 return cycle;
             }
             
-            // Salvar também no localStorage como backup
-            const cycles = this.load(STORAGE_KEYS.CYCLES) || [];
-            cycles.push(cycle);
-            this.save(STORAGE_KEYS.CYCLES, cycles);
-            
-            console.log('✅ Ciclo salvo com sucesso (backend + localStorage)');
+            // Não salvar no localStorage aqui - será salvo via saveCycles() no study-cycle.js
+            console.log('✅ Ciclo salvo com sucesso no backend');
             return await response.json();
         } catch (error) {
             // Fallback para localStorage em caso de erro (não é erro crítico)
@@ -246,7 +242,8 @@ export class StorageManager {
                 return subject;
             }
             
-            console.log('✅ Disciplina salva com sucesso');
+            // Não salvar no localStorage aqui - será salvo via saveCycles() no study-cycle.js
+            console.log('✅ Disciplina salva com sucesso no backend');
             return await response.json();
         } catch (error) {
             // Fallback para localStorage em caso de erro
