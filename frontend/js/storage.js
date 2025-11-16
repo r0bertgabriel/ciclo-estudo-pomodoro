@@ -2,7 +2,7 @@
  * Gerenciamento de Storage com Backend API
  */
 
-import { API_BASE_URL, DEFAULT_SETTINGS, STORAGE_KEYS } from './config.js';
+import { API_BASE_URL, DEFAULT_SETTINGS, STORAGE_KEYS, checkBackendAvailability } from './config.js';
 
 export class StorageManager {
     /**

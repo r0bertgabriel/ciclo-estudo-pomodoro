@@ -22,6 +22,14 @@
                 <span>Pomodoro Boladão</span>
             </h1>
             <div class="header-actions">
+                <a href="metas.html" class="header-btn" aria-label="Metas de Estudo" title="Metas de Estudo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    <span class="header-btn-text">Metas</span>
+                </a>
                 <a href="dashboard.html" class="header-btn" aria-label="Dashboard de Produtividade" title="Dashboard de Produtividade">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 3v18h18M7 16l4-4 3 3 5-5"></path>
@@ -284,8 +292,6 @@
         console.error('❌ Navegador não suporta módulos ES6!');
         alert('Seu navegador não suporta módulos ES6. Por favor, use um navegador moderno.');
     </script>
-</body>
-</html>
 
             </footer>
         </div>
@@ -460,18 +466,6 @@
         </div>
     </dialog>
 
-    <!-- Scripts -->
-    <script>
-        console.log('🌟 HTML carregado, iniciando scripts...');
-        console.log('🌟 Verificando suporte a módulos ES6...');
-        window.addEventListener('error', (e) => {
-            console.error('❌ Erro global capturado:', e.error || e.message);
-        });
-    </script>
-    <script type="module" src="./js/app.js"></script>
-    <script nomodule>
-        console.error('❌ Navegador não suporta módulos ES6!');
-        alert('Seu navegador não suporta módulos ES6. Por favor, use um navegador moderno.');
-    </script>
+    <!-- Script já carregado anteriormente - removida duplicação -->
 </body>
 </html>

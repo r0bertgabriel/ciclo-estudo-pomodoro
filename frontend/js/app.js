@@ -341,6 +341,9 @@ class PomodoroApp {
                     this.updateSubjectSelector();
                     this.updateCycleDisplay();
                     this.updateCycleStats();
+                    
+                    // Atualizar progresso das metas
+                    await this.updateGoalsProgress(this.settings.focusTime, this.selectedSubjectId);
                 }
                 
                 // Limpar seleção para forçar nova escolha
@@ -1309,6 +1312,74 @@ class PomodoroApp {
             selector.style.display = 'flex';
         } else {
             selector.style.display = 'none';
+        }
+    }
+
+    /**
+     * Atualiza o progresso das metas após completar uma sessão
+     */
+    async updateGoalsProgress(minutes, subjectId) {
+        try {
+            // Carregar metas do localStorage
+            let goals = this.storage.load('pomodoro_goals') || [];
+            
+            if (goals.length === 0) return;
+
+            const today = new Date().toISOString().split('T')[0];
+            let goalsUpdated = false;
+
+            // Atualizar cada meta ativa
+            for (const goal of goals) {
+                if (goal.status !== 'active') continue;
+
+                // Verificar se a meta está no período válido
+                const startDate = new Date(goal.start_date);
+                const endDate = new Date(goal.end_date);
+                const now = new Date();
+
+                if (now < startDate || now > endDate) continue;
+
+                // Verificar se a meta é para a disciplina específica ou todas
+                if (goal.subject_id && goal.subject_id !== subjectId) continue;
+
+                // Atualizar com base no tipo de meta
+                if (goal.target_type === 'sessions') {
+                    goal.current_value += 1;
+                } else if (goal.target_type === 'minutes') {
+                    goal.current_value += minutes;
+                }
+
+                // Verificar se completou a meta
+                if (goal.current_value >= goal.target_value && goal.status === 'active') {
+                    goal.status = 'completed';
+                    goal.completed_at = new Date().toISOString();
+                    
+                    // Mostrar notificação de meta concluída
+                    this.notifications.show(
+                        '🎯 Meta Concluída!',
+                        `Parabéns! Você atingiu sua meta de ${goal.target_value} ${goal.target_type === 'sessions' ? 'sessões' : 'minutos'}!`,
+                        { requireInteraction: true }
+                    );
+                }
+
+                goalsUpdated = true;
+
+                // Tentar atualizar no backend
+                try {
+                    await fetch(`${this.storage.API_BASE_URL || 'http://localhost:8000'}/api/goals/${goal.id}/progress?current_value=${goal.current_value}`, {
+                        method: 'PUT'
+                    });
+                } catch (error) {
+                    console.warn('Erro ao atualizar meta no backend:', error);
+                }
+            }
+
+            // Salvar metas atualizadas no localStorage
+            if (goalsUpdated) {
+                this.storage.save('pomodoro_goals', goals);
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar progresso das metas:', error);
         }
     }
 }

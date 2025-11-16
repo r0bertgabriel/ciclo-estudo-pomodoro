@@ -68,6 +68,24 @@ class Database:
             )
         ''')
         
+        # Tabela de metas
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS goals (
+                id TEXT PRIMARY KEY,
+                type TEXT NOT NULL,
+                target_type TEXT NOT NULL,
+                target_value INTEGER NOT NULL,
+                current_value INTEGER DEFAULT 0,
+                subject_id TEXT,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                status TEXT DEFAULT 'active',
+                created_at TEXT NOT NULL,
+                completed_at TEXT,
+                FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+            )
+        ''')
+        
         conn.commit()
         conn.close()
     
@@ -500,6 +518,43 @@ class Database:
             labels.append(date.strftime('%d/%m'))
             data.append(row[1] / 60)  # Converter para horas
         
+        # Buscar dados por disciplina
+        subjects_data = {}
+        if subject == 'all':
+            cursor.execute('''
+                SELECT 
+                    s.name,
+                    s.color,
+                    DATE(ss.started_at) as date,
+                    SUM(ss.minutes) as total_minutes
+                FROM study_sessions ss
+                JOIN subjects s ON ss.subject_id = s.id
+                WHERE ss.started_at >= ?
+                GROUP BY s.id, s.name, s.color, date
+                ORDER BY date
+            ''', (start_date,))
+            
+            subject_rows = cursor.fetchall()
+            for row in subject_rows:
+                subject_name = row[0]
+                subject_color = row[1]
+                if subject_name not in subjects_data:
+                    subjects_data[subject_name] = {
+                        'label': subject_name,
+                        'data': [0] * len(labels),
+                        'borderColor': subject_color,
+                        'backgroundColor': f"{subject_color}33",
+                        'borderWidth': 2,
+                        'fill': False,
+                        'tension': 0.4
+                    }
+                
+                date_obj = datetime.strptime(row[2], '%Y-%m-%d')
+                date_label = date_obj.strftime('%d/%m')
+                if date_label in labels:
+                    idx = labels.index(date_label)
+                    subjects_data[subject_name]['data'][idx] = row[3] / 60
+        
         return {
             'evolution': {
                 'labels': labels,
@@ -513,7 +568,10 @@ class Database:
                     'tension': 0.4
                 }]
             },
-            'subjects': None  # TODO: Implementar gráfico por disciplina
+            'subjects': {
+                'labels': labels,
+                'datasets': list(subjects_data.values())
+            } if subjects_data else None
         }
     
     def get_heatmap_data(self):
@@ -694,3 +752,202 @@ class Database:
         conn.close()
         
         return [{'id': s[0], 'name': s[1]} for s in subjects]
+    
+    # ===== GOALS =====
+    
+    def create_goal(self, goal_data):
+        """Cria uma nova meta"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute('''
+                INSERT INTO goals 
+                (id, type, target_type, target_value, current_value, subject_id, 
+                 start_date, end_date, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                goal_data['id'],
+                goal_data['type'],
+                goal_data['target_type'],
+                goal_data['target_value'],
+                goal_data.get('current_value', 0),
+                goal_data.get('subject_id'),
+                goal_data['start_date'],
+                goal_data['end_date'],
+                goal_data.get('status', 'active'),
+                goal_data['created_at']
+            ))
+            
+            conn.commit()
+            return goal_data
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+    
+    def get_all_goals(self):
+        """Retorna todas as metas"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT g.*, s.name as subject_name
+            FROM goals g
+            LEFT JOIN subjects s ON g.subject_id = s.id
+            ORDER BY g.created_at DESC
+        ''')
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        goals = []
+        for row in rows:
+            goal = {
+                'id': row[0],
+                'type': row[1],
+                'target_type': row[2],
+                'target_value': row[3],
+                'current_value': row[4],
+                'subject_id': row[5],
+                'start_date': row[6],
+                'end_date': row[7],
+                'status': row[8],
+                'created_at': row[9],
+                'completed_at': row[10],
+                'subject_name': row[11] if len(row) > 11 else None
+            }
+            goals.append(goal)
+        
+        return goals
+    
+    def get_active_goals(self):
+        """Retorna apenas metas ativas"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT g.*, s.name as subject_name
+            FROM goals g
+            LEFT JOIN subjects s ON g.subject_id = s.id
+            WHERE g.status = 'active'
+            ORDER BY g.end_date ASC
+        ''')
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        goals = []
+        for row in rows:
+            goal = {
+                'id': row[0],
+                'type': row[1],
+                'target_type': row[2],
+                'target_value': row[3],
+                'current_value': row[4],
+                'subject_id': row[5],
+                'start_date': row[6],
+                'end_date': row[7],
+                'status': row[8],
+                'created_at': row[9],
+                'completed_at': row[10],
+                'subject_name': row[11] if len(row) > 11 else None
+            }
+            goals.append(goal)
+        
+        return goals
+    
+    def update_goal(self, goal_id, updates):
+        """Atualiza uma meta"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        set_clauses = []
+        values = []
+        
+        for key, value in updates.items():
+            set_clauses.append(f"{key} = ?")
+            values.append(value)
+        
+        values.append(goal_id)
+        
+        cursor.execute(f'''
+            UPDATE goals 
+            SET {", ".join(set_clauses)}
+            WHERE id = ?
+        ''', values)
+        
+        conn.commit()
+        conn.close()
+        return True
+    
+    def update_goal_progress(self, goal_id, current_value):
+        """Atualiza o progresso de uma meta"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Buscar meta
+        cursor.execute('SELECT target_value, status FROM goals WHERE id = ?', (goal_id,))
+        row = cursor.fetchone()
+        
+        if not row:
+            conn.close()
+            return False
+        
+        target_value, status = row
+        
+        # Atualizar valor atual
+        cursor.execute('UPDATE goals SET current_value = ? WHERE id = ?', (current_value, goal_id))
+        
+        # Verificar se atingiu a meta
+        if current_value >= target_value and status == 'active':
+            cursor.execute('''
+                UPDATE goals 
+                SET status = 'completed', completed_at = ?
+                WHERE id = ?
+            ''', (datetime.now().isoformat(), goal_id))
+        
+        conn.commit()
+        conn.close()
+        return True
+    
+    def delete_goal(self, goal_id):
+        """Deleta uma meta"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM goals WHERE id = ?', (goal_id,))
+        
+        conn.commit()
+        conn.close()
+        return True
+    
+    def get_goals_summary(self):
+        """Retorna resumo das metas"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Contar metas por status
+        cursor.execute('''
+            SELECT status, COUNT(*) as count
+            FROM goals
+            GROUP BY status
+        ''')
+        
+        status_counts = {row[0]: row[1] for row in cursor.fetchall()}
+        
+        # Calcular taxa de conclusão
+        total = sum(status_counts.values())
+        completed = status_counts.get('completed', 0)
+        completion_rate = (completed / total * 100) if total > 0 else 0
+        
+        conn.close()
+        
+        return {
+            'total': total,
+            'active': status_counts.get('active', 0),
+            'completed': completed,
+            'failed': status_counts.get('failed', 0),
+            'completion_rate': round(completion_rate, 1)
+        }

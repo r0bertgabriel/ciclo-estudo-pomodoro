@@ -1,16 +1,10 @@
-# Dependências do Backend (FastAPI)
-fastapi==0.121.0
-uvicorn==0.38.0
-pydantic==2.12.3
+# Este arquivo referencia as dependências do backend
+# Para instalar todas as dependências, use:
+#   pip install -r backend/requirements.txt
 
-# Bibliotecas padrão do Python (já incluídas)
-# - json
-# - sqlite3
-# - datetime
-# - typing
-# - subprocess
-# - sys
-# - time
-# - webbrowser
-# - pathlib
-# - tkinter (incluído com Python, mas pode precisar de instalação separada no Linux)
+-r backend/requirements.txt
+
+# Nota: tkinter pode precisar de instalação separada no Linux:
+#   Ubuntu/Debian: sudo apt-get install python3-tk
+#   Fedora: sudo dnf install python3-tkinter
+#   Arch: sudo pacman -S tk

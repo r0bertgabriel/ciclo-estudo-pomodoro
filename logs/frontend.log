@@ -1,18 +1,32 @@
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File 127.0.0.1 - - [06/Nov/2025 20:47:11] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [06/Nov/2025 20:50:35] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [06/Nov/2025 20:57:47] "HEAD / HTTP/1.1" 200 -
-Class(addr, HandlerClass) as httpd:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/br4b0/miniconda3/lib/python3.12/socketserver.py", line 457, in __init__
-    self.server_bind()
-  File "/home/br4b0/miniconda3/lib/python3.12/http/server.py", line 1308, in server_bind
-    return super().server_bind()
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/br4b0/miniconda3/lib/python3.12/http/server.py", line 136, in server_bind
-    socketserver.TCPServer.server_bind(self)
-  File "/home/br4b0/miniconda3/lib/python3.12/socketserver.py", line 473, in server_bind
-    self.socket.bind(self.server_address)
-OSError: [Errno 98] Address already in use
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/study-cycle.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/health-reminders.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/notifications.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/config.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/timer.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/storage.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:56] "GET /js/ui.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:57] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:57] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:57] "GET /manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:50:59] "GET /metas.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:59] "GET /js/metas.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 19:50:59] "GET /ciclos.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:51:01] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 19:51:05] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:40] "GET /metas.html HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:40] "GET /js/metas.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:40] "GET /js/study-cycle.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:42] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:43] "GET /dashboard.html HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:43] "GET /dashboard.css HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:03:43] "GET /js/dashboard.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 20:03:45] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:04:17] "GET /ciclos.html HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:04:17] "GET /js/ciclos.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 20:04:17] "GET /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2025 20:04:19] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:04:24] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [16/Nov/2025 20:04:39] "GET /sw.js HTTP/1.1" 304 -

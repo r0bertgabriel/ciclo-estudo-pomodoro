@@ -71,6 +71,23 @@ class StatsUpdate(BaseModel):
     totalFocusTime: int
     totalBreakTime: int
 
+class GoalCreate(BaseModel):
+    id: str
+    type: str  # 'daily', 'weekly', 'monthly'
+    target_type: str  # 'sessions', 'minutes', 'hours'
+    target_value: int
+    current_value: Optional[int] = 0
+    subject_id: Optional[str] = None
+    start_date: str
+    end_date: str
+    status: Optional[str] = 'active'
+    created_at: str
+
+class GoalUpdate(BaseModel):
+    current_value: Optional[int] = None
+    status: Optional[str] = None
+    completed_at: Optional[str] = None
+
 # ===== CYCLES ENDPOINTS =====
 
 @app.get("/")
@@ -368,6 +385,66 @@ async def restore_backup(file: bytes):
             f.write(file)
         
         return {"message": "Backup restored successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===== GOALS ENDPOINTS =====
+
+@app.post("/api/goals")
+async def create_goal(goal: GoalCreate):
+    """Cria uma nova meta"""
+    try:
+        result = db.create_goal(goal.dict())
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/goals")
+async def get_goals(active_only: bool = False):
+    """Retorna todas as metas ou apenas ativas"""
+    try:
+        if active_only:
+            goals = db.get_active_goals()
+        else:
+            goals = db.get_all_goals()
+        return goals
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/goals/summary")
+async def get_goals_summary():
+    """Retorna resumo das metas"""
+    try:
+        summary = db.get_goals_summary()
+        return summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/goals/{goal_id}")
+async def update_goal(goal_id: str, goal: GoalUpdate):
+    """Atualiza uma meta"""
+    try:
+        updates = {k: v for k, v in goal.dict().items() if v is not None}
+        db.update_goal(goal_id, updates)
+        return {"message": "Goal updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/goals/{goal_id}/progress")
+async def update_goal_progress(goal_id: str, current_value: int):
+    """Atualiza o progresso de uma meta"""
+    try:
+        db.update_goal_progress(goal_id, current_value)
+        return {"message": "Goal progress updated"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/goals/{goal_id}")
+async def delete_goal(goal_id: str):
+    """Deleta uma meta"""
+    try:
+        db.delete_goal(goal_id)
+        return {"message": "Goal deleted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

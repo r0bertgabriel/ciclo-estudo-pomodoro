@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerenciar Metas de Estudo">
+    <meta name="theme-color" content="#667eea">
+    
+    <title>Metas de Estudo - Pomodoro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="ciclos.css">
+    
+    <style>
+        .goals-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .goals-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .goals-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .goals-header h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .goals-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .goals-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .goal-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .goal-card.completed {
+            border: 3px solid #48bb78;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .goal-type {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .goal-type.daily {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        .goal-type.weekly {
+            background: #ebf5fb;
+            color: #3498db;
+        }
+
+        .goal-type.monthly {
+            background: #f4ecf7;
+            color: #9b59b6;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .goal-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .goal-actions button:hover {
+            opacity: 1;
+        }
+
+        .goal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .goal-subject {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .goal-progress {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.completed {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+        }
+
+        .goal-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.completed {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        /* Modal */
+        dialog {
+            border: none;
+            border-radius: 20px;
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding: 20px 25px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body class="goals-page">
+    <div class="goals-container">
+        <!-- Header -->
+        <div class="goals-header">
+            <h1>
+                🎯 Minhas Metas
+                <a href="index.html" style="margin-left: auto; font-size: 1rem; color: #667eea; text-decoration: none;">← Voltar ao Timer</a>
+            </h1>
+            
+            <!-- Summary Cards -->
+            <div class="goals-summary">
+                <div class="summary-card">
+                    <h3>Total de Metas</h3>
+                    <div class="value" id="totalGoals">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Metas Ativas</h3>
+                    <div class="value" id="activeGoals">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Concluídas</h3>
+                    <div class="value" id="completedGoals">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Taxa de Conclusão</h3>
+                    <div class="value" id="completionRate">0%</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="goals-actions">
+                <button class="btn-primary" id="newGoalBtn">
+                    ➕ Nova Meta
+                </button>
+            </div>
+        </div>
+
+        <!-- Goals Grid -->
+        <div class="goals-grid" id="goalsGrid"></div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <h2>🎯 Nenhuma meta criada</h2>
+            <p>Comece definindo suas metas de estudo para acompanhar seu progresso!</p>
+            <button class="btn-primary" onclick="document.getElementById('newGoalBtn').click()">
+                ➕ Criar Primeira Meta
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Nova Meta -->
+    <dialog id="goalModal">
+        <div class="modal-header">
+            <h2 id="modalTitle">Nova Meta</h2>
+        </div>
+        <form id="goalForm" class="modal-body">
+            <div class="form-group">
+                <label for="goalType">Tipo de Meta</label>
+                <select id="goalType" required>
+                    <option value="daily">Diária</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensal</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="targetType">O que deseja alcançar?</label>
+                <select id="targetType" required>
+                    <option value="sessions">Número de Sessões</option>
+                    <option value="minutes">Minutos de Estudo</option>
+                    <option value="hours">Horas de Estudo</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="targetValue">Meta</label>
+                <input type="number" id="targetValue" min="1" required placeholder="Ex: 5">
+            </div>
+
+            <div class="form-group">
+                <label for="subjectId">Disciplina (opcional)</label>
+                <select id="subjectId">
+                    <option value="">Todas as disciplinas</option>
+                </select>
+            </div>
+        </form>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancelGoalBtn">Cancelar</button>
+            <button type="submit" form="goalForm" class="btn-primary">Criar Meta</button>
+        </div>
+    </dialog>
+
+    <script type="module" src="js/metas.js"></script>
+</body>
+</html>
