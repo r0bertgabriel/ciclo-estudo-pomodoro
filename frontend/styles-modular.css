@@ -1,0 +1,29 @@
+/**
+ * Pomodoro Timer - CSS Modular
+ * Arquivo principal que importa todos os módulos
+ */
+
+/* Variáveis e Temas */
+@import './css/variables.css';
+
+/* Base e Reset */
+@import './css/base.css';
+
+/* Layout */
+@import './css/layout.css';
+
+/* Componentes */
+@import './css/buttons.css';
+@import './css/timer.css';
+@import './css/stats.css';
+@import './css/cycles.css';
+
+/* Animações */
+@import './css/animations.css';
+@import './css/status-animations.css';
+
+/* Funcionalidades de Streaming */
+@import './css/streaming.css';
+
+/* Responsivo */
+@import './css/responsive.css';

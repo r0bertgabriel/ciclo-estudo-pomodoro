@@ -12,12 +12,17 @@
 
 Sistema completo de Pomodoro Timer integrado com gerenciamento de ciclos de estudos, controle semanal de horas por disciplina e persistência em banco de dados SQLite.
 
-> **✨ Novidades:**  
+> **✨ Novidades v1.4.0 - Funcionalidades de Streaming:**  
+> 🎬 **Modo Streaming** - Funcionalidades para transmissão ao vivo  
+> ✨ **Animações de Status** - Efeitos visuais em mudanças de modo  
+> 📊 **Barra de Progresso Grande** - Meta diária animada e visível  
+> 🎉 **Relatório Visual** - Card compartilhável ao final do ciclo  
+> 🔢 **Contadores Visíveis** - Stats em tempo real (topo direito)  
+> 📚 **Histórico Lateral** - Sidebar com sessões recentes  
+> 📱 **QR Code + ngrok** - Acesso público via mobile  
+> 🎨 **CSS Modular** - Código organizado em 11 módulos  
+> 🖥️ **Desktop Optimized** - Timer 250-350% maior em telas grandes  
 > ✅ Backend com FastAPI + SQLite  
-> ✅ API REST para persistência de dados  
-> ✅ Interface dedicada para gerenciamento de ciclos  
-> ✅ Sistema de edição de disciplinas  
-> ✅ Controle semanal com bloqueio automático  
 > ✅ Scripts de inicialização automática (Linux/Mac/Windows)
 
 ---

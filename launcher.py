@@ -2,8 +2,10 @@
 """
 🍅 Pomodoro Boladão - Launcher
 Script Python para iniciar a aplicação com interface gráfica
+Modo Streaming ativado automaticamente com ngrok
 """
 
+import platform
 import subprocess
 import sys
 import time
@@ -30,6 +32,33 @@ class PomodoroLauncher:
         self.backend_process = None
         self.frontend_process = None
         self.project_dir = Path(__file__).parent
+        self.platform = platform.system()
+        self.ngrok_available = self.check_ngrok()
+        self.enable_ngrok = self.ngrok_available  # Auto-ativar se disponível
+    
+    def check_ngrok(self):
+        """Verifica se ngrok está instalado no sistema"""
+        try:
+            result = subprocess.run(
+                ['ngrok', 'version'],
+                capture_output=True,
+                text=True,
+                timeout=3
+            )
+            if result.returncode == 0:
+                print("✅ ngrok detectado - Modo streaming ativado automaticamente")
+                return True
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+        
+        print("ℹ️  ngrok não encontrado - Executando em modo local")
+        if self.platform == "Linux":
+            print("   Para modo streaming: sudo snap install ngrok")
+        elif self.platform == "Darwin":
+            print("   Para modo streaming: brew install ngrok/ngrok/ngrok")
+        elif self.platform == "Windows":
+            print("   Para modo streaming: https://ngrok.com/download")
+        return False
         
     def check_dependencies(self):
         """Verifica se as dependências estão instaladas"""
@@ -53,12 +82,20 @@ class PomodoroLauncher:
         log_file = self.project_dir / "logs" / "backend.log"
         log_file.parent.mkdir(exist_ok=True)
         
+        # Configurar variável de ambiente para ngrok
+        import os
+        env = os.environ.copy()
+        if self.enable_ngrok:
+            env['ENABLE_NGROK'] = 'true'
+            print("🌍 Modo streaming ativado (ngrok)")
+        
         with open(log_file, "w") as f:
             self.backend_process = subprocess.Popen(
                 BACKEND_CMD,
                 stdout=f,
                 stderr=subprocess.STDOUT,
-                cwd=self.project_dir
+                cwd=self.project_dir,
+                env=env
             )
         time.sleep(3)
         print("✅ Backend iniciado!")
@@ -242,7 +279,22 @@ class PomodoroLauncher:
             self.stop()
 
 def main():
+    print("\n" + "="*50)
+    print("🍅 POMODORO BOLADÃO")
+    print("="*50)
+    
     launcher = PomodoroLauncher()
+    
+    if launcher.enable_ngrok:
+        print("\n🎬 Modo Streaming Ativado Automaticamente!")
+        print("Funcionalidades:")
+        print("  ✨ Animações de status")
+        print("  📊 Barra de progresso grande")
+        print("  🎉 Relatório visual")
+        print("  📚 Histórico lateral")
+        print("  📱 QR Code (canto superior direito)")
+        print("  🌍 Acesso público via ngrok")
+        print("  👁️  Visitantes em modo somente leitura\n")
     
     if HAS_GUI and "--console" not in sys.argv:
         launcher.run_gui()

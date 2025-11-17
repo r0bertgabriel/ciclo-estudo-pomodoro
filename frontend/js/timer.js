@@ -103,6 +103,9 @@ export class Timer {
             isFinalCountdown: this.timeLeft <= 10 && this.timeLeft > 0,
             isFinalStretch: this.timeLeft <= 180 && this.timeLeft > 10
         });
+        
+        // Disparar evento customizado para streaming features
+        document.dispatchEvent(new CustomEvent('timerTick'));
 
         if (this.timeLeft <= 0) {
             this.complete();
@@ -123,6 +126,15 @@ export class Timer {
             mode: this.currentMode,
             completedPomodoros: this.completedPomodoros
         });
+        
+        // Disparar evento customizado para streaming features
+        document.dispatchEvent(new CustomEvent('sessionComplete', {
+            detail: {
+                type: this.currentMode,
+                completedPomodoros: this.completedPomodoros,
+                cycleComplete: this.completedPomodoros % 4 === 0
+            }
+        }));
     }
 
     /**
@@ -132,6 +144,11 @@ export class Timer {
     setMode(mode) {
         this.currentMode = mode;
         this.emit('modeChange', { mode });
+        
+        // Disparar evento customizado para streaming features
+        document.dispatchEvent(new CustomEvent('modeChanged', {
+            detail: { mode }
+        }));
     }
 
     /**

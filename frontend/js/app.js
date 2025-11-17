@@ -186,6 +186,17 @@ class PomodoroApp {
             this.resetStats();
         });
 
+        // Preview de som
+        const previewBtn = document.getElementById('previewSound');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', () => {
+                const soundType = document.getElementById('alarmSound').value;
+                if (soundType !== 'none') {
+                    this.notifications.previewSound(soundType);
+                }
+            });
+        }
+
         // Subject selector
         const subjectSelect = document.getElementById('subjectSelect');
         if (subjectSelect) {
@@ -311,9 +322,15 @@ class PomodoroApp {
         // Mostrar mensagem de conclusão
         this.ui.showCompletionMessage(data.mode);
         
-        // Tocar som
+        // Tocar som apropriado
         if (this.settings.notifications) {
-            this.notifications.playSound(this.settings.alarmSound);
+            // Som diferente para foco vs pausa
+            if (data.mode === TIMER_MODES.FOCUS) {
+                this.notifications.playSound(this.settings.alarmSound);
+            } else {
+                // Som mais suave para fim de pausa
+                this.notifications.playBreakSound();
+            }
         }
         
         // Mostrar notificação
@@ -1353,6 +1370,9 @@ class PomodoroApp {
                 if (goal.current_value >= goal.target_value && goal.status === 'active') {
                     goal.status = 'completed';
                     goal.completed_at = new Date().toISOString();
+                    
+                    // Tocar som de sucesso especial
+                    this.notifications.playSuccessSound();
                     
                     // Mostrar notificação de meta concluída
                     this.notifications.show(

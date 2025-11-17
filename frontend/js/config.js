@@ -159,6 +159,91 @@ export const DEFAULT_MESSAGES = {
     [TIMER_MODES.LONG_BREAK]: "Pausa longa para lamentar escolhas de vida."
 };
 
+// Configuração de sons (totalmente offline - Web Audio API)
+export const SOUND_PROFILES = {
+    bell: {
+        name: '🔔 Sino',
+        notes: [
+            { freq: 800, duration: 0.3, type: 'sine', volume: 0.5 },
+            { freq: 600, duration: 0.4, type: 'sine', volume: 0.4 }
+        ]
+    },
+    chime: {
+        name: '🎵 Carrilhão',
+        notes: [
+            { freq: 523, duration: 0.25, type: 'sine', volume: 0.4 },
+            { freq: 659, duration: 0.25, type: 'sine', volume: 0.4 },
+            { freq: 784, duration: 0.35, type: 'sine', volume: 0.5 }
+        ]
+    },
+    digital: {
+        name: '💻 Digital',
+        notes: [
+            { freq: 1000, duration: 0.15, type: 'square', volume: 0.3 },
+            { freq: 1000, duration: 0.15, type: 'square', volume: 0.3 },
+            { freq: 1000, duration: 0.2, type: 'square', volume: 0.3 }
+        ]
+    },
+    nature: {
+        name: '🌿 Natureza',
+        notes: [
+            { freq: 440, duration: 0.3, type: 'sine', volume: 0.4 },
+            { freq: 550, duration: 0.3, type: 'sine', volume: 0.4 },
+            { freq: 660, duration: 0.4, type: 'sine', volume: 0.5 }
+        ]
+    },
+    success: {
+        name: '🎉 Sucesso',
+        notes: [
+            { freq: 523, duration: 0.15, type: 'sine', volume: 0.4 },
+            { freq: 659, duration: 0.15, type: 'sine', volume: 0.4 },
+            { freq: 784, duration: 0.15, type: 'sine', volume: 0.4 },
+            { freq: 1047, duration: 0.3, type: 'sine', volume: 0.5 }
+        ]
+    },
+    calm: {
+        name: '😌 Calmo',
+        notes: [
+            { freq: 392, duration: 0.4, type: 'sine', volume: 0.3 },
+            { freq: 330, duration: 0.5, type: 'sine', volume: 0.35 }
+        ]
+    },
+    energetic: {
+        name: '⚡ Energético',
+        notes: [
+            { freq: 880, duration: 0.1, type: 'sawtooth', volume: 0.3 },
+            { freq: 1047, duration: 0.1, type: 'sawtooth', volume: 0.3 },
+            { freq: 1319, duration: 0.1, type: 'sawtooth', volume: 0.35 },
+            { freq: 1568, duration: 0.2, type: 'sawtooth', volume: 0.4 }
+        ]
+    },
+    zen: {
+        name: '🧘 Zen',
+        notes: [
+            { freq: 256, duration: 0.6, type: 'sine', volume: 0.3 },
+            { freq: 384, duration: 0.7, type: 'sine', volume: 0.25 }
+        ]
+    },
+    celebration: {
+        name: '🎊 Celebração',
+        notes: [
+            { freq: 523, duration: 0.1, type: 'sine', volume: 0.35 },
+            { freq: 659, duration: 0.1, type: 'sine', volume: 0.35 },
+            { freq: 784, duration: 0.1, type: 'sine', volume: 0.35 },
+            { freq: 1047, duration: 0.15, type: 'sine', volume: 0.4 },
+            { freq: 1319, duration: 0.15, type: 'sine', volume: 0.4 },
+            { freq: 1568, duration: 0.2, type: 'sine', volume: 0.45 }
+        ]
+    },
+    subtle: {
+        name: '🔅 Sutil',
+        notes: [
+            { freq: 600, duration: 0.2, type: 'sine', volume: 0.2 }
+        ]
+    }
+};
+
+// Manter compatibilidade com código antigo
 export const SOUND_FREQUENCIES = {
     bell: [800, 600],
     chime: [523, 659, 784],

@@ -1,0 +1,133 @@
+/**
+ * Botões
+ */
+
+.icon-btn {
+    background: linear-gradient(135deg, var(--color-card) 0%, var(--color-bg) 100%);
+    border: 2px solid var(--color-border);
+    color: var(--color-text);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: var(--current-primary);
+    opacity: 0.2;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
+}
+
+.icon-btn:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+.icon-btn:hover {
+    background: var(--current-primary);
+    color: white;
+    border-color: var(--current-primary);
+    transform: rotate(90deg) scale(1.05);
+    box-shadow: 0 4px 15px var(--current-glow);
+}
+
+.icon-btn:active {
+    transform: rotate(90deg) scale(0.95);
+    box-shadow: 0 2px 10px var(--current-glow);
+}
+
+.icon-btn svg {
+    position: relative;
+    z-index: 1;
+}
+
+.control-btn {
+    flex: 1;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.control-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.control-btn span {
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.control-btn.primary {
+    background: linear-gradient(135deg, var(--current-primary) 0%, color-mix(in srgb, var(--current-primary) 80%, black) 100%);
+    color: white;
+    box-shadow: 0 8px 24px var(--current-glow);
+    border: 2px solid transparent;
+}
+
+.control-btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px var(--current-glow);
+    filter: brightness(1.1);
+}
+
+.control-btn.primary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px var(--current-glow);
+}
+
+.control-btn.secondary {
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+    font-weight: 600;
+}
+
+.control-btn.secondary:hover {
+    background: var(--color-card);
+    border-color: var(--current-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn.secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}

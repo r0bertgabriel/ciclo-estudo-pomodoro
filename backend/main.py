@@ -8,8 +8,10 @@ from pydantic import BaseModel
 # Import compatível com Windows e Linux
 try:
     from backend.database import Database
+    from backend.ngrok_integration import get_ngrok_url, init_ngrok
 except ModuleNotFoundError:
     from database import Database
+    from ngrok_integration import get_ngrok_url, init_ngrok
 
 app = FastAPI(title="Pomodoro API", version="1.0.0")
 
@@ -237,6 +239,24 @@ async def get_general_stats():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/stats/today")
+async def get_today_stats():
+    """Retorna estatísticas de hoje para contadores de streaming"""
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        stats = db.get_day_stats(today)
+        
+        # Calcular streak atual
+        streak = db.get_current_streak()
+        
+        return {
+            "total_minutes": stats.get("total_minutes", 0),
+            "sessions_completed": stats.get("sessions_completed", 0),
+            "current_streak": streak
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/stats/chart-data")
 async def get_chart_data(period: str = "week", subject: str = "all"):
     """Retorna dados para gráficos de evolução"""
@@ -447,6 +467,29 @@ async def delete_goal(goal_id: str):
         return {"message": "Goal deleted"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ===== NGROK & QR CODE =====
+
+@app.get("/api/ngrok/url")
+async def get_public_url():
+    """Retorna URL pública do ngrok"""
+    print("🔍 Endpoint /api/ngrok/url chamado")
+    url = get_ngrok_url()
+    if url:
+        print(f"✅ Retornando URL: {url}")
+        return {"url": url, "qr_data": url, "active": True}
+    print("❌ Ngrok não está ativo")
+    return {"url": None, "message": "Ngrok não está ativo", "active": False}
+
+@app.on_event("startup")
+async def startup_event():
+    """Inicia ngrok ao iniciar o servidor"""
+    import os
+    if os.getenv("ENABLE_NGROK", "false").lower() == "true":
+        print("🚀 Iniciando túnel ngrok...")
+        url = init_ngrok(8000)
+        if url:
+            print(f"✅ Acesso público via: {url}")
 
 if __name__ == "__main__":
     import uvicorn

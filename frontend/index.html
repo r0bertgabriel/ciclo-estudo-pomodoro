@@ -6,14 +6,14 @@
     <meta name="description" content="Aplicativo Pomodoro moderno e customizável">
     <meta name="theme-color" content="#e74c3c">
     
-    <title>Pomodoro Boladão</title>
+    <title>🍅 Pomodoro Boladão</title>
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- Styles Modulares -->
+    <link rel="stylesheet" href="styles-modular.css">
 </head>
 <body class="focus-mode">
     <div id="app">
@@ -44,8 +44,8 @@
                 </a>
                 <button class="header-btn" id="settingsBtn" aria-label="Configurações do Timer" title="Configurações do Timer">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6m4.22-13.22l-1.42 1.42M10.2 13.8l-1.42 1.42m0-10.44l1.42 1.42m4.36 4.36l1.42 1.42M1 12h6m6 0h6"></path>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     <span class="header-btn-text">Config</span>
                 </button>
@@ -254,16 +254,34 @@
                 </fieldset>
 
                 <fieldset class="settings-group">
-                    <legend>Som</legend>
+                    <legend>Som (100% Offline)</legend>
                     
                     <div class="setting-item">
-                        <label for="alarmSound">Som de Alarme</label>
-                        <select id="alarmSound" name="alarmSound">
-                            <option value="bell">🔔 Sino</option>
-                            <option value="chime">🎵 Carrilhão</option>
-                            <option value="digital">💻 Digital</option>
-                            <option value="none">🔇 Nenhum</option>
-                        </select>
+                        <label for="alarmSound">
+                            Som de Alarme
+                            <span style="font-size: 0.8em; opacity: 0.7; font-weight: normal;">
+                                (Sons gerados localmente)
+                            </span>
+                        </label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="alarmSound" name="alarmSound" style="flex: 1;">
+                                <option value="bell">🔔 Sino</option>
+                                <option value="chime">🎵 Carrilhão</option>
+                                <option value="digital">💻 Digital</option>
+                                <option value="nature">🌿 Natureza</option>
+                                <option value="success">🎉 Sucesso</option>
+                                <option value="calm">😌 Calmo</option>
+                                <option value="energetic">⚡ Energético</option>
+                                <option value="zen">🧘 Zen</option>
+                                <option value="celebration">🎊 Celebração</option>
+                                <option value="subtle">🔅 Sutil</option>
+                                <option value="none">🔇 Nenhum</option>
+                            </select>
+                            <button type="button" id="previewSound" class="control-btn secondary" 
+                                    style="padding: 8px 16px; white-space: nowrap;">
+                                🔊 Testar
+                            </button>
+                        </div>
                     </div>
                 </fieldset>
             </form>
@@ -287,7 +305,16 @@
             console.error('❌ Erro global capturado:', e.error || e.message);
         });
     </script>
+    
+    <!-- Bibliotecas externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Scripts principais -->
+    <script type="module" src="./js/access-control.js"></script>
     <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/streaming-features.js"></script>
+    <script type="module" src="./js/qr-code.js"></script>
     <script nomodule>
         console.error('❌ Navegador não suporta módulos ES6!');
         alert('Seu navegador não suporta módulos ES6. Por favor, use um navegador moderno.');

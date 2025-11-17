@@ -1,0 +1,284 @@
+/**
+ * Timer Card e Componentes
+ */
+
+.timer-card {
+    background: var(--color-card);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--color-border);
+    display: grid;
+    gap: var(--spacing-lg);
+}
+
+/* Mode Selector */
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-xs);
+    background: var(--color-bg);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-md);
+}
+
+.mode-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+
+.mode-btn:hover {
+    color: var(--color-text);
+    background: var(--color-card);
+}
+
+.mode-btn.active {
+    background: var(--current-primary);
+    color: white;
+}
+
+/* Subject Selector */
+.subject-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-card) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--current-primary);
+    box-shadow: 0 4px 16px rgba(231, 76, 60, 0.15);
+}
+
+.subject-selector-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.subject-icon {
+    font-size: 1.5rem;
+}
+
+.subject-selector label {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 1rem;
+    flex: 1;
+}
+
+.subject-select {
+    padding: var(--spacing-md);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-card);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.subject-select:hover {
+    border-color: var(--current-primary);
+}
+
+.subject-select:focus {
+    outline: none;
+    border-color: var(--current-primary);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+.subject-info-display {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.subject-info-display.warning {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+}
+
+.subject-info-display.limit-reached {
+    background: rgba(244, 67, 54, 0.1);
+    border: 2px solid rgba(244, 67, 54, 0.4);
+    animation: pulse-warning 2s ease-in-out infinite;
+}
+
+.subject-progress-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.progress-label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.progress-values {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.progress-values strong {
+    color: var(--current-primary);
+}
+
+.subject-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--current-primary), color-mix(in srgb, var(--current-primary) 80%, white));
+    border-radius: var(--radius-md);
+    transition: width var(--transition-normal), background var(--transition-normal);
+    box-shadow: 0 0 10px var(--current-glow);
+    position: relative;
+}
+
+.progress-fill.warning {
+    background: linear-gradient(90deg, #ff9800, #ffc107);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+}
+
+.progress-fill.limit-reached {
+    background: linear-gradient(90deg, #f44336, #e91e63);
+    box-shadow: 0 0 15px rgba(244, 67, 54, 0.6);
+    animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+.time-remaining {
+    font-weight: 600;
+    color: var(--current-primary);
+    font-size: 0.9rem;
+}
+
+/* Timer Display */
+.timer-display {
+    display: grid;
+    gap: var(--spacing-lg);
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+}
+
+.time {
+    font-size: clamp(4rem, 12vw, 6rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--current-primary);
+    text-shadow: 
+        0 4px 20px var(--current-glow),
+        0 0 40px var(--current-glow);
+    letter-spacing: -0.02em;
+    transition: all var(--transition-normal);
+}
+
+.time.pulse-animation {
+    animation: timePulse 1s ease-in-out infinite;
+}
+
+.motivation-quote {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--current-glow), transparent);
+    border-radius: var(--radius-md);
+    color: var(--current-primary);
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 600;
+    font-style: italic;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--current-primary);
+    text-align: center;
+    line-height: 1.4;
+    transition: opacity var(--transition-normal);
+}
+
+.session-info {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+/* Timer Controls */
+.timer-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+/* Progress Bar */
+.progress-bar {
+    height: 12px;
+    background: var(--color-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--current-primary);
+    box-shadow: 
+        0 4px 20px var(--current-glow),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        var(--current-primary) 0%, 
+        color-mix(in srgb, var(--current-primary) 80%, white) 50%,
+        var(--current-primary) 100%
+    );
+    width: 0%;
+    transition: width 1s linear;
+    box-shadow: 0 0 20px var(--current-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    animation: progressShimmer 2s infinite;
+}

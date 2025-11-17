@@ -518,60 +518,66 @@ class Database:
             labels.append(date.strftime('%d/%m'))
             data.append(row[1] / 60)  # Converter para horas
         
-        # Buscar dados por disciplina
-        subjects_data = {}
-        if subject == 'all':
-            cursor.execute('''
-                SELECT 
-                    s.name,
-                    s.color,
-                    DATE(ss.started_at) as date,
-                    SUM(ss.minutes) as total_minutes
-                FROM study_sessions ss
-                JOIN subjects s ON ss.subject_id = s.id
-                WHERE ss.started_at >= ?
-                GROUP BY s.id, s.name, s.color, date
-                ORDER BY date
-            ''', (start_date,))
-            
-            subject_rows = cursor.fetchall()
-            for row in subject_rows:
-                subject_name = row[0]
-                subject_color = row[1]
-                if subject_name not in subjects_data:
-                    subjects_data[subject_name] = {
-                        'label': subject_name,
-                        'data': [0] * len(labels),
-                        'borderColor': subject_color,
-                        'backgroundColor': f"{subject_color}33",
-                        'borderWidth': 2,
-                        'fill': False,
-                        'tension': 0.4
-                    }
-                
-                date_obj = datetime.strptime(row[2], '%Y-%m-%d')
-                date_label = date_obj.strftime('%d/%m')
-                if date_label in labels:
-                    idx = labels.index(date_label)
-                    subjects_data[subject_name]['data'][idx] = row[3] / 60
+        # Buscar dados por disciplina para gráfico de pizza/barras
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        subjects_query = '''
+            SELECT 
+                s.name,
+                s.color,
+                SUM(ss.minutes) as total_minutes
+            FROM study_sessions ss
+            JOIN subjects s ON ss.subject_id = s.id
+            WHERE ss.started_at >= ?
+        '''
+        subjects_params = [start_date]
+        
+        if subject_id != 'all':
+            subjects_query += ' AND s.id = ?'
+            subjects_params.append(subject_id)
+        
+        subjects_query += ' GROUP BY s.id, s.name, s.color ORDER BY total_minutes DESC'
+        
+        cursor.execute(subjects_query, subjects_params)
+        subject_rows = cursor.fetchall()
+        
+        subjects_labels = []
+        subjects_data = []
+        subjects_colors = []
+        
+        for row in subject_rows:
+            subjects_labels.append(row[0])
+            subjects_data.append(round(row[2] / 60, 1))  # Horas
+            subjects_colors.append(row[1] if row[1] else '#667eea')
+        
+        conn.close()
+        
+        subjects_result = None
+        if subjects_labels:
+            subjects_result = {
+                'labels': subjects_labels,
+                'datasets': [{
+                    'label': 'Horas Estudadas',
+                    'data': subjects_data,
+                    'backgroundColor': subjects_colors
+                }]
+            }
         
         return {
             'evolution': {
-                'labels': labels,
+                'labels': labels if labels else [],
                 'datasets': [{
                     'label': 'Horas de Estudo',
-                    'data': data,
+                    'data': data if data else [],
                     'borderColor': '#667eea',
                     'backgroundColor': 'rgba(102, 126, 234, 0.1)',
                     'borderWidth': 3,
                     'fill': True,
                     'tension': 0.4
-                }]
+                }] if data else []
             },
-            'subjects': {
-                'labels': labels,
-                'datasets': list(subjects_data.values())
-            } if subjects_data else None
+            'subjects': subjects_result
         }
     
     def get_heatmap_data(self):
@@ -951,3 +957,59 @@ class Database:
             'failed': status_counts.get('failed', 0),
             'completion_rate': round(completion_rate, 1)
         }
+    
+    def get_day_stats(self, date):
+        """Retorna estatísticas de um dia específico"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                SUM(duration) as total_minutes,
+                COUNT(*) as sessions_completed
+            FROM sessions
+            WHERE date(timestamp) = date(?)
+        ''', (date,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        return {
+            'total_minutes': row[0] or 0,
+            'sessions_completed': row[1] or 0
+        }
+    
+    def get_current_streak(self):
+        """Calcula a sequência atual de dias com estudo"""
+        from datetime import datetime, timedelta
+        
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Buscar datas únicas com sessões (ordenadas desc)
+        cursor.execute('''
+            SELECT DISTINCT date(timestamp) as study_date
+            FROM sessions
+            ORDER BY study_date DESC
+        ''')
+        
+        dates = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        
+        if not dates:
+            return 0
+        
+        streak = 0
+        current_date = datetime.now().date()
+        
+        for date_str in dates:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+            
+            # Se é hoje ou ontem, continua a sequência
+            if date_obj == current_date or date_obj == current_date - timedelta(days=1):
+                streak += 1
+                current_date = date_obj - timedelta(days=1)
+            else:
+                break
+        
+        return streak

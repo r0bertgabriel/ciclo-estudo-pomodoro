@@ -175,23 +175,17 @@ class Dashboard {
             this.charts.evolution.destroy();
         }
 
-        // Dados de exemplo se não houver dados reais
-        const defaultData = {
-            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-            datasets: [{
-                label: 'Horas de Estudo',
-                data: [2, 3, 2.5, 4, 3.5, 1, 0.5],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        };
+        // Se não houver dados, mostrar mensagem
+        if (!data || !data.labels || data.labels.length === 0) {
+            ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+            const parent = ctx.parentElement;
+            parent.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999; font-size: 1.1rem;">Nenhum dado disponível ainda. Comece a estudar!</div>';
+            return;
+        }
 
         this.charts.evolution = new Chart(ctx, {
             type: 'line',
-            data: data || defaultData,
+            data: data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -227,22 +221,16 @@ class Dashboard {
             this.charts.subjectPie.destroy();
         }
 
-        const pieData = data || {
-            labels: ['Matemática', 'Física', 'Química', 'Biologia'],
-            datasets: [{
-                data: [25, 30, 20, 25],
-                backgroundColor: [
-                    '#667eea',
-                    '#f093fb',
-                    '#4facfe',
-                    '#43e97b'
-                ]
-            }]
-        };
+        // Se não houver dados, mostrar mensagem
+        if (!data || !data.labels || data.labels.length === 0) {
+            const parent = ctxPie.parentElement;
+            parent.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">Sem dados</div>';
+            return;
+        }
 
         this.charts.subjectPie = new Chart(ctxPie, {
             type: 'doughnut',
-            data: pieData,
+            data: data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -261,23 +249,16 @@ class Dashboard {
             this.charts.subjectBar.destroy();
         }
 
-        const barData = data || {
-            labels: ['Matemática', 'Física', 'Química', 'Biologia'],
-            datasets: [{
-                label: 'Horas Estudadas',
-                data: [12, 15, 10, 13],
-                backgroundColor: [
-                    '#667eea',
-                    '#f093fb',
-                    '#4facfe',
-                    '#43e97b'
-                ]
-            }]
-        };
+        // Se não houver dados, mostrar mensagem
+        if (!data || !data.labels || data.labels.length === 0) {
+            const parent = ctxBar.parentElement;
+            parent.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">Sem dados</div>';
+            return;
+        }
 
         this.charts.subjectBar = new Chart(ctxBar, {
             type: 'bar',
-            data: barData,
+            data: data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -308,12 +289,20 @@ class Dashboard {
             this.renderHeatmap(data);
         } catch (error) {
             console.error('Erro ao carregar heatmap:', error);
-            this.renderHeatmap(null); // Renderizar com dados de exemplo
+            // Renderizar vazio se não houver dados
+            const container = document.getElementById('heatmapContainer');
+            container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 300px; color: #999; font-size: 1.1rem;">Nenhum dado disponível ainda. Comece a estudar!</div>';
         }
     }
 
     renderHeatmap(data) {
         const container = document.getElementById('heatmapContainer');
+        
+        // Se não houver dados, mostrar mensagem
+        if (!data) {
+            container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 300px; color: #999; font-size: 1.1rem;">Nenhum dado disponível ainda. Comece a estudar!</div>';
+            return;
+        }
         
         const days = ['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
         const hours = ['6h', '7h', '8h', '9h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h'];
@@ -329,8 +318,8 @@ class Dashboard {
         hours.forEach((hour, hourIndex) => {
             html += `<div class="heatmap-time">${hour}</div>`;
             for (let day = 0; day < 7; day++) {
-                const intensity = data ? (data[day]?.[hourIndex] || 0) : Math.floor(Math.random() * 5);
-                const minutes = intensity * 15; // Exemplo
+                const intensity = data[day]?.[hourIndex] || 0;
+                const minutes = intensity * 15;
                 html += `<div class="heatmap-cell" data-intensity="${intensity}" title="${minutes} min">
                     ${minutes > 0 ? minutes : ''}
                 </div>`;
