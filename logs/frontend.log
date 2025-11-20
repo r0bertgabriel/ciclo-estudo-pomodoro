@@ -1,7 +1,7 @@
-127.0.0.1 - - [19/Nov/2025 15:17:55] "GET /js/streaming-features.js HTTP/1.1" 304 -
-127.0.0.1 - - [19/Nov/2025 15:17:55] "GET /js/qr-code.js HTTP/1.1" 304 -
-127.0.0.1 - - [19/Nov/2025 15:17:56] code 404, message File not found
-127.0.0.1 - - [19/Nov/2025 15:17:56] "GET /sw.js HTTP/1.1" 404 -
-127.0.0.1 - - [19/Nov/2025 15:18:02] "GET / HTTP/1.1" 304 -
-127.0.0.1 - - [19/Nov/2025 15:18:03] code 404, message File not found
-127.0.0.1 - - [19/Nov/2025 15:18:03] "GET /sw.js HTTP/1.1" 404 -
+127.0.0.1 - - [20/Nov/2025 15:35:05] code 404, message File not found
+127.0.0.1 - - [20/Nov/2025 15:35:05] "GET /sw.js HTTP/1.1" 404 -
+127.0.0.1 - - [20/Nov/2025 15:35:05] "GET /js/study-cycle.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Nov/2025 15:35:07] code 404, message File not found
+127.0.0.1 - - [20/Nov/2025 15:35:07] "GET /sw.js HTTP/1.1" 404 -
+127.0.0.1 - - [20/Nov/2025 15:35:11] code 404, message File not found
+127.0.0.1 - - [20/Nov/2025 15:35:11] "GET /sw.js HTTP/1.1" 404 -

@@ -1,63 +1,10 @@
-INFO:     Started server process [18281]
+INFO:     Started server process [18518]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-📁 Servindo arquivos estáticos de: /home/br4b0/Desktop/Development/in_silico/prototipos/ciclo-estudo-pomodoro/frontend
-🚀 Iniciando túnel ngrok...
-✅ Túnel ngrok ativo: https://3a99654522b4.ngrok-free.app
-✅ Acesso público via: https://3a99654522b4.ngrok-free.app
-🔍 Endpoint /api/ngrok/url chamado
-📡 URL ngrok solicitada: https://3a99654522b4.ngrok-free.app
-✅ Retornando URL: https://3a99654522b4.ngrok-free.app
-INFO:     127.0.0.1:55452 - "GET /api/ngrok/url HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55452 - "GET /api/health HTTP/1.1" 200 OK
-🔍 Endpoint /api/ngrok/url chamado
-📡 URL ngrok solicitada: https://3a99654522b4.ngrok-free.app
-✅ Retornando URL: https://3a99654522b4.ngrok-free.app
-INFO:     127.0.0.1:55462 - "GET /api/ngrok/url HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55462 - "GET /api/cycles HTTP/1.1" 200 OK
-INFO:     127.0.0.1:32772 - "GET /api/health HTTP/1.1" 200 OK
-🔍 Endpoint /api/ngrok/url chamado
-📡 URL ngrok solicitada: https://3a99654522b4.ngrok-free.app
-✅ Retornando URL: https://3a99654522b4.ngrok-free.app
-INFO:     127.0.0.1:32776 - "GET /api/ngrok/url HTTP/1.1" 200 OK
-INFO:     127.0.0.1:32772 - "GET /api/cycles HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET / HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /favicon.ico HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET / HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
-🔍 Endpoint /api/ngrok/url chamado
-📡 URL ngrok solicitada: https://3a99654522b4.ngrok-free.app
-✅ Retornando URL: https://3a99654522b4.ngrok-free.app
-INFO:     127.0.0.1:42240 - "GET /api/ngrok/url HTTP/1.1" 200 OK
-INFO:     170.82.182.149:0 - "GET /api/timer/state HTTP/1.1" 200 OK
+📁 Servindo arquivos estáticos de: /home/kali/Desktop/insilico/ciclo-estudo-pomodoro/frontend
+INFO:     127.0.0.1:52048 - "GET /api/cycles HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [18281]
+INFO:     Finished server process [18518]
