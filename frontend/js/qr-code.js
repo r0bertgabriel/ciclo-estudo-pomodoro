@@ -2,6 +2,8 @@
  * Módulo de QR Code com integração ngrok
  */
 
+import { API_BASE_URL } from './config.js';
+
 class QRCodeManager {
     constructor() {
         this.container = null;
@@ -41,7 +43,7 @@ class QRCodeManager {
     async checkNgrokStatus() {
         try {
             console.log('🔍 Verificando status do ngrok...');
-            const response = await fetch('/api/ngrok/url');
+            const response = await fetch(`${API_BASE_URL}/api/ngrok/url`);
             console.log('📡 Resposta do servidor:', response.status);
             
             if (response.ok) {

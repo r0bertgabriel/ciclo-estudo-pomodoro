@@ -252,9 +252,14 @@ export const SOUND_FREQUENCIES = {
 
 // API Configuration
 // Detecta automaticamente se está rodando localmente ou em produção
-export const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isNgrok = window.location.hostname.includes('ngrok');
+
+export const API_BASE_URL = isLocalhost 
     ? 'http://localhost:8000'
-    : `${window.location.protocol}//${window.location.hostname}:8000`;
+    : isNgrok
+        ? `${window.location.protocol}//${window.location.hostname}` // ngrok já roteia para backend
+        : `${window.location.protocol}//${window.location.hostname}:8000`;
 
 // Flag para verificar se backend está disponível
 /**

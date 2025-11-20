@@ -2,6 +2,8 @@
  * Módulo de animações de status e funcionalidades de streaming
  */
 
+import { API_BASE_URL } from './config.js';
+
 class StreamingFeatures {
     constructor() {
         this.counters = {
@@ -74,10 +76,10 @@ class StreamingFeatures {
             this.handleSessionComplete(e.detail);
         });
 
-        // Escutar eventos de timer tick
-        document.addEventListener('timerTick', () => {
-            this.updateCounters();
-        });
+        // Eventos de timer tick desabilitados - contadores removidos
+        // document.addEventListener('timerTick', () => {
+        //     this.updateCounters();
+        // });
     }
 
     animateModeChange(mode) {
@@ -113,8 +115,8 @@ class StreamingFeatures {
             type: data.type || 'work'
         });
 
-        // Atualizar contadores
-        this.updateCounters();
+        // Atualizar contadores - desabilitado
+        // this.updateCounters();
 
         // Mostrar relatório se for fim de ciclo
         if (data.cycleComplete) {
@@ -162,27 +164,17 @@ class StreamingFeatures {
     }
 
     async updateCounters() {
+        // Contadores desabilitados - funcionalidade removida
+        // Apenas atualizar dados para o histórico se necessário
         try {
-            // Buscar dados do backend
-            const response = await fetch('/api/stats/today');
+            const response = await fetch(`${API_BASE_URL}/api/stats/today`);
             if (response.ok) {
                 const data = await response.json();
-                
-                const hours = Math.floor(data.total_minutes / 60);
-                const minutes = data.total_minutes % 60;
-                
-                document.getElementById('counter-today').textContent = 
-                    `${hours}h ${minutes}m`;
-                document.getElementById('counter-sessions').textContent = 
-                    data.sessions_completed || 0;
-                document.getElementById('counter-streak').textContent = 
-                    data.current_streak || 0;
-
                 // Atualizar barra de progresso
                 this.updateDailyProgress(data.sessions_completed || 0);
             }
         } catch (error) {
-            console.error('Erro ao atualizar contadores:', error);
+            // Silenciar erro - contadores não estão mais no DOM
         }
     }
 
@@ -267,8 +259,8 @@ class StreamingFeatures {
             this.updateHistoryDisplay();
         }
         
-        // Atualizar contadores do backend
-        await this.updateCounters();
+        // Contadores desabilitados - não carregar do backend
+        // await this.updateCounters();
     }
 
     saveToStorage() {

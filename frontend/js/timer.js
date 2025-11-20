@@ -2,7 +2,7 @@
  * Gerenciamento do Timer
  */
 
-import { TIMER_MODES } from './config.js';
+import { API_BASE_URL, TIMER_MODES } from './config.js';
 
 export class Timer {
     constructor() {
@@ -15,6 +15,56 @@ export class Timer {
         this.completedPomodoros = 0;
         this.timerInterval = null;
         this.callbacks = {};
+        this.isReadOnly = false; // Será definido externamente
+        this.syncCounter = 0; // Contador para sincronizar a cada N ticks
+    }
+    
+    /**
+     * Sincroniza estado com o servidor (apenas se não for read-only)
+     */
+    async syncToServer() {
+        console.log('🌐 Timer.syncToServer EXECUTANDO! isReadOnly:', this.isReadOnly);
+        
+        if (this.isReadOnly) {
+            console.log('⏭️ Timer.syncToServer: Ignorando (modo read-only)');
+            return;
+        }
+        
+        console.log('✅ Timer.syncToServer: Modo controlador confirmado, continuando...');
+        
+        try {
+            const state = {
+                timeLeft: this.timeLeft,
+                totalTime: this.totalTime,
+                isRunning: this.isRunning,
+                isPaused: this.isPaused,
+                currentMode: this.currentMode,
+                sessionCount: this.sessionCount,
+                completedPomodoros: this.completedPomodoros,
+                timestamp: Date.now()
+            };
+            
+            console.log('📤 Timer.syncToServer: Enviando estado:', {
+                timeLeft: state.timeLeft,
+                isRunning: state.isRunning,
+                isPaused: state.isPaused,
+                currentMode: state.currentMode
+            });
+            
+            const response = await fetch(`${API_BASE_URL}/api/timer/state`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(state)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Timer.syncToServer: Estado enviado com sucesso');
+            } else {
+                console.warn('⚠️ Timer.syncToServer: Erro na resposta:', response.status);
+            }
+        } catch (error) {
+            console.error('❌ Timer.syncToServer: Erro ao enviar:', error);
+        }
     }
 
     /**
@@ -42,6 +92,7 @@ export class Timer {
      * @param {number} minutes - Tempo em minutos
      */
     start(minutes) {
+        console.log('🚀 Timer.start() chamado! isReadOnly:', this.isReadOnly, 'minutes:', minutes);
         if (this.timeLeft === 0) {
             this.timeLeft = minutes * 60;
             this.totalTime = this.timeLeft;
@@ -51,6 +102,9 @@ export class Timer {
         this.isPaused = false;
         
         this.emit('start', { mode: this.currentMode });
+        console.log('🔄 Timer.start: Prestes a chamar syncToServer...');
+        this.syncToServer(); // Sincronizar ao iniciar
+        console.log('✅ Timer.start: syncToServer foi chamado');
 
         this.timerInterval = setInterval(() => {
             this.tick();
@@ -65,6 +119,7 @@ export class Timer {
         this.isPaused = true;
         clearInterval(this.timerInterval);
         this.emit('pause');
+        this.syncToServer(); // Sincronizar ao pausar
     }
 
     /**
@@ -75,6 +130,7 @@ export class Timer {
         this.isPaused = false;
         clearInterval(this.timerInterval);
         this.emit('stop');
+        this.syncToServer(); // Sincronizar ao parar
     }
 
     /**
@@ -86,6 +142,7 @@ export class Timer {
         this.timeLeft = minutes * 60;
         this.totalTime = this.timeLeft;
         this.emit('reset', { timeLeft: this.timeLeft, totalTime: this.totalTime });
+        this.syncToServer(); // Sincronizar ao resetar
     }
 
     /**
@@ -103,6 +160,13 @@ export class Timer {
             isFinalCountdown: this.timeLeft <= 10 && this.timeLeft > 0,
             isFinalStretch: this.timeLeft <= 180 && this.timeLeft > 10
         });
+        
+        // Sincronizar com servidor a cada 2 segundos
+        this.syncCounter++;
+        if (this.syncCounter >= 2) {
+            this.syncCounter = 0;
+            this.syncToServer();
+        }
         
         // Disparar evento customizado para streaming features
         document.dispatchEvent(new CustomEvent('timerTick'));

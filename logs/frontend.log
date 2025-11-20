@@ -1,49 +1,7 @@
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /js/access-control.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /styles-modular.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /js/streaming-features.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /js/qr-code.js HTTP/1.1" 200 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /css/status-animations.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /css/streaming.css HTTP/1.1" 200 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /api/stats/today HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:35:39] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:35:39] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:35:41] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:36:09] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:36:09] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:36:39] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:36:39] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:37:09] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:37:09] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:37:39] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:37:39] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:38:09] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:38:09] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:38:39] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:38:39] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:38:58] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /js/streaming-features.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /js/access-control.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /js/qr-code.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/variables.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/base.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/layout.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/buttons.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/timer.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/cycles.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/stats.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/responsive.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/streaming.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /css/animations.css HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /api/stats/today HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:38:59] "GET / HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:39:01] "GET /sw.js HTTP/1.1" 304 -
-127.0.0.1 - - [17/Nov/2025 11:39:03] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:39:03] "GET /api/stats/today HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:39:03] code 404, message File not found
-127.0.0.1 - - [17/Nov/2025 11:39:03] "GET /api/ngrok/url HTTP/1.1" 404 -
-127.0.0.1 - - [17/Nov/2025 11:39:04] "GET /sw.js HTTP/1.1" 304 -
+127.0.0.1 - - [19/Nov/2025 15:17:55] "GET /js/streaming-features.js HTTP/1.1" 304 -
+127.0.0.1 - - [19/Nov/2025 15:17:55] "GET /js/qr-code.js HTTP/1.1" 304 -
+127.0.0.1 - - [19/Nov/2025 15:17:56] code 404, message File not found
+127.0.0.1 - - [19/Nov/2025 15:17:56] "GET /sw.js HTTP/1.1" 404 -
+127.0.0.1 - - [19/Nov/2025 15:18:02] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [19/Nov/2025 15:18:03] code 404, message File not found
+127.0.0.1 - - [19/Nov/2025 15:18:03] "GET /sw.js HTTP/1.1" 404 -

@@ -1,7 +1,10 @@
 /**
  * Aplicação Principal Pomodoro Timer
  * Arquitetura modular com ES6+ e padrões modernos
+ * VERSÃO: 2025-11-19-15:00 - SINCRONIZAÇÃO TEMPO REAL IMPLEMENTADA
  */
+
+console.log('🔥 APP.JS CARREGADO - VERSÃO NOVA COM SINCRONIZAÇÃO');
 
 import { TIMER_MODES } from './config.js';
 import { HealthReminders } from './health-reminders.js';
@@ -10,6 +13,7 @@ import { StorageManager } from './storage.js';
 import { StudyCycle } from './study-cycle.js';
 import { Timer } from './timer.js';
 import { UIManager } from './ui.js';
+import ViewerSync from './viewer-sync.js';
 
 class PomodoroApp {
     constructor() {
@@ -62,6 +66,34 @@ class PomodoroApp {
             
             // Atualizar display do ciclo após carregamento
             this.updateCycleDisplay();
+            
+            console.log('🚀 CHECKPOINT 1: Iniciando verificação de modo');
+            
+            // Verificar se está em modo read-only
+            const isReadOnly = window.accessControl?.isReadOnly || false;
+            console.log('🔍 Verificando modo:', { 
+                isReadOnly, 
+                hasAccessControl: !!window.accessControl,
+                hostname: window.location.hostname 
+            });
+            
+            // Configurar o timer
+            this.timer.isReadOnly = isReadOnly;
+            console.log('🔧 Timer configurado:', {
+                isReadOnly: this.timer.isReadOnly,
+                hasSyncToServer: typeof this.timer.syncToServer === 'function',
+                timerObject: this.timer
+            });
+            
+            if (isReadOnly) {
+                // Modo visualização - sincronizar com servidor
+                console.log('👁️ Iniciando em modo visualização (ViewerSync)');
+                this.viewerSync = new ViewerSync(this.timer, true);
+            } else {
+                // Modo normal - timer sincroniza diretamente com servidor
+                console.log('👑 Iniciando em modo controle - Timer sincronizará automaticamente');
+                console.log('🔍 Verificando Timer.syncToServer:', this.timer.syncToServer);
+            }
             
             console.log('🍅 Pomodoro Timer iniciado com sucesso!');
         } catch (error) {

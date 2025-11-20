@@ -264,6 +264,15 @@ class PomodoroLauncher:
             print(f"📚 Ciclos: http://localhost:{FRONTEND_PORT}/ciclos.html")
             print(f"📊 Dashboard: http://localhost:{FRONTEND_PORT}/dashboard.html")
             print(f"🔧 API:    http://localhost:{BACKEND_PORT}/docs")
+            
+            if self.enable_ngrok:
+                print("\n" + "="*50)
+                print("🌍 ACESSO PÚBLICO VIA NGROK")
+                print("="*50)
+                print(f"📱 Use a porta {BACKEND_PORT} (backend serve frontend também)")
+                print(f"🔗 Aguarde ~5s e veja o QR Code no canto superior direito")
+                print(f"👁️  Visitantes entram em modo somente leitura")
+            
             print("\n💡 Pressione Ctrl+C para parar\n")
             
             # Manter rodando

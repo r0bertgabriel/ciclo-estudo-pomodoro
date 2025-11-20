@@ -17,7 +17,16 @@ class AccessControl {
         const urlParams = new URLSearchParams(window.location.search);
         const readOnlyParam = urlParams.get('readonly');
         
-        return isNgrok || readOnlyParam === 'true';
+        const result = isNgrok || readOnlyParam === 'true';
+        
+        console.log('🔐 AccessControl.checkReadOnlyMode:', {
+            hostname,
+            isNgrok,
+            readOnlyParam,
+            result
+        });
+        
+        return result;
     }
 
     init() {
@@ -38,15 +47,41 @@ class AccessControl {
     }
 
     disableControls() {
-        // Desabilitar todos os botões de controle
-        const controlButtons = document.querySelectorAll(
-            '.control-btn, .mode-btn, .settings-btn, #settingsBtn, ' +
-            'button[type="submit"], button[type="button"]'
-        );
+        // Ocultar tudo exceto o timer principal
+        const hideSelectors = [
+            '.controls',           // Botões de controle
+            '.mode-buttons',       // Botões de modo
+            '.settings-btn',       // Botão de configurações
+            '#settingsBtn',
+            '.session-history-sidebar',  // Histórico lateral
+            '.subject-info',       // Info de matéria
+            '.cycle-info',         // Info de ciclo
+            'nav',                 // Navegação
+            'header',              // Cabeçalho se houver
+            '.stats-container',    // Estatísticas
+            '.footer'              // Rodapé
+        ];
         
+        hideSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                el.style.display = 'none';
+            });
+        });
+        
+        // Centralizar e destacar o timer
+        const timerCard = document.querySelector('.timer-card');
+        if (timerCard) {
+            timerCard.style.margin = '80px auto';
+            timerCard.style.maxWidth = '500px';
+            timerCard.style.transform = 'scale(1.2)';
+        }
+        
+        // Desabilitar todos os botões restantes
+        const controlButtons = document.querySelectorAll('button');
         controlButtons.forEach(btn => {
             btn.disabled = true;
-            btn.style.opacity = '0.5';
+            btn.style.opacity = '0.3';
             btn.style.cursor = 'not-allowed';
             btn.title = 'Modo somente visualização';
         });
@@ -58,25 +93,17 @@ class AccessControl {
             input.readOnly = true;
         });
 
-        // Ocultar botões que não fazem sentido em modo leitura
-        const hideElements = document.querySelectorAll(
-            '.session-history-toggle'
-        );
-        hideElements.forEach(el => {
-            el.style.display = 'none';
-        });
-
-        // Prevenir cliques
+        // Prevenir todas as interações
         document.addEventListener('click', (e) => {
             const target = e.target;
-            if (target.matches('button, input, select, textarea, .control-btn, .mode-btn')) {
+            if (target.matches('button, input, select, textarea, .control-btn, .mode-btn, a')) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
         }, true);
 
-        console.log('🔒 Controles desabilitados');
+        console.log('🔒 Modo visualização ativo - apenas timer visível');
     }
 
     showReadOnlyBanner() {

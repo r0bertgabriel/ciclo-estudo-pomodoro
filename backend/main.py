@@ -1,8 +1,12 @@
+import os
 from datetime import datetime
+from pathlib import Path
 from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # Import compatível com Windows e Linux
@@ -90,11 +94,18 @@ class GoalUpdate(BaseModel):
     status: Optional[str] = None
     completed_at: Optional[str] = None
 
-# ===== CYCLES ENDPOINTS =====
+# ===== FRONTEND SERVING =====
+# Configurar servir o frontend ANTES das rotas da API
+frontend_path = Path(__file__).parent.parent / "frontend"
 
-@app.get("/")
-async def root():
-    return {"message": "Pomodoro API is running"}
+if frontend_path.exists():
+    # Servir arquivos estáticos (CSS, JS, etc)
+    app.mount("/css", StaticFiles(directory=str(frontend_path / "css")), name="css")
+    app.mount("/js", StaticFiles(directory=str(frontend_path / "js")), name="js")
+    app.mount("/public", StaticFiles(directory=str(frontend_path / "public")), name="public")
+    print(f"📁 Servindo arquivos estáticos de: {frontend_path}")
+
+# ===== CYCLES ENDPOINTS =====
 
 @app.get("/api/health")
 async def health_check():
@@ -105,6 +116,42 @@ async def health_check():
         "version": "1.0.0",
         "timestamp": datetime.now().isoformat()
     }
+
+# Estado global do timer (em memória para simplicidade)
+timer_state = {
+    "timeLeft": 1500,  # 25 min padrão
+    "totalTime": 1500,
+    "isRunning": False,
+    "isPaused": False,
+    "currentMode": "focus",
+    "sessionCount": 1,
+    "completedPomodoros": 0,
+    "lastUpdate": datetime.now().isoformat()
+}
+
+@app.get("/api/timer/state")
+async def get_timer_state():
+    """Retorna o estado atual do timer para sincronização de visualizadores"""
+    return timer_state
+
+@app.post("/api/timer/state")
+async def update_timer_state(state: dict):
+    """Atualiza o estado do timer (chamado pela aba master)"""
+    global timer_state
+    
+    print(f"📥 BACKEND: Recebendo atualização do timer:")
+    print(f"   - timeLeft: {state.get('timeLeft')}")
+    print(f"   - isRunning: {state.get('isRunning')}")
+    print(f"   - isPaused: {state.get('isPaused')}")
+    print(f"   - currentMode: {state.get('currentMode')}")
+    
+    timer_state.update(state)
+    timer_state["lastUpdate"] = datetime.now().isoformat()
+    
+    print(f"✅ BACKEND: Estado atualizado com sucesso")
+    print(f"📊 BACKEND: Estado atual no servidor: {timer_state}")
+    
+    return {"success": True}
 
 @app.post("/api/cycles")
 async def create_cycle(cycle: CycleCreate):
@@ -246,16 +293,24 @@ async def get_today_stats():
         today = datetime.now().strftime("%Y-%m-%d")
         stats = db.get_day_stats(today)
         
-        # Calcular streak atual
-        streak = db.get_current_streak()
+        # Calcular streak atual (com fallback)
+        try:
+            streak = db.get_current_streak()
+        except:
+            streak = 0
         
         return {
-            "total_minutes": stats.get("total_minutes", 0),
-            "sessions_completed": stats.get("sessions_completed", 0),
+            "total_minutes": stats.get("total_minutes", 0) if stats else 0,
+            "sessions_completed": stats.get("sessions_completed", 0) if stats else 0,
             "current_streak": streak
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Retornar valores padrão em caso de erro
+        return {
+            "total_minutes": 0,
+            "sessions_completed": 0,
+            "current_streak": 0
+        }
 
 @app.get("/api/stats/chart-data")
 async def get_chart_data(period: str = "week", subject: str = "all"):
@@ -490,6 +545,37 @@ async def startup_event():
         url = init_ngrok(8000)
         if url:
             print(f"✅ Acesso público via: {url}")
+
+# ===== FRONTEND HTML ROUTES (DEVEM SER AS ÚLTIMAS) =====
+# Estas rotas devem estar no final para não sobrescrever as rotas da API
+
+if frontend_path.exists():
+    # Rota para servir o viewer.html para ngrok, index.html para localhost
+    @app.get("/")
+    async def serve_frontend(request: Request):
+        # Detectar se é acesso via ngrok
+        host = request.headers.get("host", "")
+        if "ngrok" in host.lower():
+            # Servir página de visualização
+            return FileResponse(str(frontend_path / "viewer.html"))
+        else:
+            # Servir aplicação completa
+            return FileResponse(str(frontend_path / "index.html"))
+    
+    # Rota catch-all para SPA routing e arquivos HTML
+    @app.get("/{full_path:path}")
+    async def catch_all(full_path: str):
+        # Se for uma rota da API, deixar passar
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+        
+        # Verificar se o arquivo existe
+        file_path = frontend_path / full_path
+        if file_path.is_file():
+            return FileResponse(str(file_path))
+        
+        # Se não existir, retornar index.html (para SPA routing)
+        return FileResponse(str(frontend_path / "index.html"))
 
 if __name__ == "__main__":
     import uvicorn

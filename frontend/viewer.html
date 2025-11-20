@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍅 Timer Visualização</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .viewer-container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .viewer-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-display {
+            font-size: 120px;
+            font-weight: 700;
+            margin: 40px 0;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -5px;
+            transition: all 0.3s ease;
+        }
+
+        .timer-display.running {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .mode-display {
+            font-size: 28px;
+            margin: 20px 0;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 300;
+        }
+
+        .mode-display.focus {
+            color: #ff6b6b;
+        }
+
+        .mode-display.break {
+            color: #4ecdc4;
+        }
+
+        .mode-display.longBreak {
+            color: #95e1d3;
+        }
+
+        .quote-display {
+            font-size: 20px;
+            margin: 30px 0;
+            opacity: 0.8;
+            font-style: italic;
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.running {
+            background: #4ecdc4;
+        }
+
+        .status-indicator.paused {
+            background: #feca57;
+            animation: none;
+        }
+
+        .status-indicator.stopped {
+            background: #ff6b6b;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            margin: 20px auto;
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform-origin: 50% 50%;
+        }
+
+        .session-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading {
+            font-size: 24px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="viewer-container">
+        <div class="viewer-badge">
+            👁️ Modo Visualização em Tempo Real
+        </div>
+
+        <div class="timer-display" id="timerDisplay">25:00</div>
+
+        <div class="mode-display" id="modeDisplay">
+            <span class="status-indicator stopped" id="statusIndicator"></span>
+            FOCADO
+        </div>
+
+        <div class="quote-display" id="quoteDisplay">
+            Aguardando início da sessão...
+        </div>
+
+        <div class="session-info">
+            <div>
+                🍅 Sessão <span id="sessionCount">1</span>
+            </div>
+            <div>
+                ✅ Completos <span id="completedCount">0</span>
+            </div>
+        </div>
+
+        <div class="connection-status">
+            <span id="connectionStatus">🔄 Sincronizando...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        // Detectar API base URL
+        const API_BASE_URL = window.location.protocol + '//' + window.location.hostname + 
+                            (window.location.hostname === 'localhost' ? ':8000' : '');
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const modeDisplay = document.getElementById('modeDisplay');
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        const sessionCount = document.getElementById('sessionCount');
+        const completedCount = document.getElementById('completedCount');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        const quotes = {
+            focus: [
+                "Foco total no seu objetivo! 🎯",
+                "Cada segundo conta! ⏰",
+                "Você está fazendo progresso! 💪",
+                "Mantenha a concentração! 🧠",
+                "Esse é o seu momento! ⭐"
+            ],
+            break: [
+                "Respire fundo e relaxe 😌",
+                "Você merece este descanso! ☕",
+                "Recarregue suas energias 🔋",
+                "Um pequeno break para grandes resultados 🌟"
+            ],
+            longBreak: [
+                "Pausa bem merecida! 🎉",
+                "Descanse bem para a próxima rodada! 🌙",
+                "Você está arrasando! 🚀"
+            ]
+        };
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateUI(state) {
+            // Atualizar tempo
+            timerDisplay.textContent = formatTime(state.timeLeft || 1500);
+            
+            // Atualizar status do display
+            if (state.isRunning && !state.isPaused) {
+                timerDisplay.classList.add('running');
+                statusIndicator.className = 'status-indicator running';
+            } else if (state.isPaused) {
+                timerDisplay.classList.remove('running');
+                statusIndicator.className = 'status-indicator paused';
+            } else {
+                timerDisplay.classList.remove('running');
+                statusIndicator.className = 'status-indicator stopped';
+            }
+
+            // Atualizar modo
+            const modeNames = {
+                focus: 'FOCADO',
+                break: 'PAUSA',
+                longBreak: 'PAUSA LONGA'
+            };
+            const modeText = modeNames[state.currentMode] || 'FOCADO';
+            modeDisplay.innerHTML = `
+                <span class="status-indicator ${state.isRunning ? 'running' : 'stopped'}" id="statusIndicator"></span>
+                ${modeText}
+            `;
+            modeDisplay.className = `mode-display ${state.currentMode}`;
+
+            // Atualizar frase motivacional
+            const quoteList = quotes[state.currentMode] || quotes.focus;
+            const randomQuote = quoteList[Math.floor(Math.random() * quoteList.length)];
+            quoteDisplay.textContent = randomQuote;
+
+            // Atualizar contadores
+            sessionCount.textContent = state.sessionCount || 1;
+            completedCount.textContent = state.completedPomodoros || 0;
+
+            // Atualizar status de conexão
+            connectionStatus.innerHTML = '🟢 Conectado';
+        }
+
+        async function syncWithServer() {
+            try {
+                console.log('🔍 VIEWER: Buscando estado do servidor...', API_BASE_URL);
+                const response = await fetch(`${API_BASE_URL}/api/timer/state`);
+                
+                if (response.ok) {
+                    const state = await response.json();
+                    console.log('📦 VIEWER: Estado recebido:', state);
+                    updateUI(state);
+                    connectionStatus.innerHTML = '🟢 Atualizado ' + new Date().toLocaleTimeString();
+                } else {
+                    console.warn('⚠️ VIEWER: Resposta não OK:', response.status);
+                    connectionStatus.innerHTML = '🟡 Reconectando...';
+                }
+            } catch (error) {
+                console.error('❌ VIEWER: Erro ao sincronizar:', error);
+                connectionStatus.innerHTML = '🔴 Erro de conexão';
+            }
+        }
+
+        // Sincronizar a cada 500ms para tempo real
+        setInterval(syncWithServer, 500);
+
+        // Primeira sincronização imediata
+        syncWithServer();
+
+        console.log('👁️ Viewer Mode Ativo - Sincronizando em tempo real');
+    </script>
+</body>
+</html>
